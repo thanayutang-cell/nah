@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    class student{
+        // constructor(id,name){
+        //     this.id = "00000000";
+        //     this.name = "noName";
+        // }
+        constructor(id,name){
+            this.id = id;
+            this.name =name;
+            this.mail ="...@mail.com";
+        }
+        getstudent(){
+            console.log("student detail:",this.id, this.name, this.mail);
+        }
+        setmail(email){
+            this.mail=mail;
+            getstudent();
+        }
+    }
+    let stu1 = new student("6809405768","Adam");
+    let stu2 = new student("6809000789","Anotony");
+    console.log("Student 1:", stu1.id, stu1.name);
+    console.log("Student 2:", stu1.id, stu2.name);
+    console.log("----");
+    stu2.getstudent();
+</script>
+</html>

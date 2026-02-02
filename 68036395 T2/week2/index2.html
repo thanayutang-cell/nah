@@ -1,0 +1,43 @@
+<body>
+    ex 2: Array Object
+    <script>
+        var member = [ {name: "Adam", address:{province:"Bangkhen",city:"Bangkok"}},
+                        {name: "Antony", address:{province:"Bangkhen",city:"Bangkok"}},
+                        {name: "Bob", address:{province:"Bangkhen",city:"Bangkok"}} ];
+                        for(var index=0;index<member.lenght;index++)
+        console.log(member);
+        console.log(member[0].name);
+        document.getElementById("result").innerHTML = member[2].name+" "+number[2].address.city;
+        var index=0;
+        do{
+            console.log(member[index].name+" city:"+member[index].address.city);
+            index++;
+        }while(index<member.lenght);
+        var index=0;
+        while(index<member.lenght){
+            console.log(member)
+        }
+    </script>
+    <hr>
+    ex1: ................ <br><br>
+    Input A: <input id="inputA" type="number" value="1000"><br><br>
+    Input B: <input id="inputB" type="number" value="800"><br><br>
+    <button onclick='calculate(document.getElementById("input_A").value,
+        document.getElementById("input_B").value,)'>calculate</button><br><br>
+    output: <label id="output">...</label>
+</body>
+<script>
+    function calculate( income = 0, cost = 0, other = 0){
+        if(Number(income) >= Number(cost))
+        return document.getElementById("output").innerHTML = "Profit: " +(Number(income)-Number(cost)-Number(other));
+    else
+        return "Loss: "+(Number(income)-Number(cost)-Number(other));
+    }
+    ipt>
+    function calculate( income = 0, cost = 0, other = 0){
+        if(Number(income) >= Number(cost))
+        return document.getElementById("output").innerHTML = "Profit: " +(Number(income)-Number(cost)-Number(other));
+    else
+        return "Loss: "+(Number(income)-Number(cost)-Number(other));
+    }
+</script>

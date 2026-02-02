@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    class Node{
+        constructor(value="x"){
+            this.value = value;
+            this.next = null;
+
+        }
+        setValue(value){
+            this.value = value;
+        }
+        getNode(){
+            console.log("["+this.value+"|"+this.next+"]");
+        }
+        
+    }
+    class LinkedList{
+        constructor(){
+            this.head = null;
+            this.last = this.head;
+        }
+        set(){
+            let newNode = new Node(value);
+            let tmp = this.head;
+            if(tmp == null)
+                this.head = newNode;
+            else{
+                while(tmp.next !=null ){
+                    tmp = tmp.next;
+                }
+                tmp.next = newNode;
+            }
+        }
+        remove(index){
+            
+        }
+        setValue(index,value){
+
+        }
+        get(index){
+            if(this.head !=null)
+            this.head = this.head.next
+        }
+        pop(value){
+            if(this.head != null){
+                if(this.head.next == null){
+                    this.head = null;
+                }else{
+                    let current= this.head.next;
+                    let tmp = head;
+                    while(current.next!=null){
+                        tmp = current;
+                        current = current.next;
+                    }
+                    tmp.next = null;
+                }
+            }else console.log("can't pop() in List...");
+        }
+        push2(value){
+            let newNode = new Node(value);
+            if(this.last == null)
+                this.head = this.last = newNode;
+            else{
+                newNode.next= this.last
+                this.last = newNode
+            }
+            this.last.next = newNode;
+            this.last =newNodes;
+        }
+        push(value){
+            let newNode = new Node(value);
+            let tmp = this.head;
+            if(tmp == null)
+                this.head = newNode;
+            else{
+                while(tmp.next !=null ){
+                    tmp = tmp.next;
+                }
+                tmp.next = newNode;
+            }
+
+            
+        }
+        unship(value){
+            let newNode = new Node(value);
+            newNode.next = this.head;
+            this.head = newNode;
+            // if(this.head == null);
+            // this.head = newNode;
+            // else{
+            //     newNode.next = this.head;
+            //     tihs.head = newNode
+            // }
+
+        }
+        ship(){
+            if(this.head !=null)
+            this.head = this.head.next
+        //     if(this.head == null)
+        //     console.log("can't ship()in List...");
+        // else{
+        //     this.head = this.head.next;
+        }
+        }
+        getList(){
+            if(this.head == null)
+            return"List is Empty ! \n[ ]";
+        else{
+            let result ="List is not Empty \n";
+            let tmp = this.head;
+            result += "["+tmp.value+"]-->";
+                while(tmp.next !=null){
+                    tmp = tmp.next;
+                    result += "["+tmp.value+"]-->";
+                }
+            return result+null;
+        }
+    }
+    
+    let list = new LinkedList();
+    console.log(list.getList());
+    list.unship('A');
+    list.unship('B');
+    list.unship('C');
+    console.log(list.getList());
+    list.ship();list.ship
+    console.log(list.getList());
+    list.push(10);list.push(20);list.push(30);
+    console.log(list.getList());
+    // let node1 = new Node('A');
+    // let node2 = new Node('B');
+    // let node3 = new Node('C');
+    // let node4 = new Node('D');
+
+    // node1.next = node2;
+    // node2.next = node3;
+    // // node4.next = node1;
+    // node2.next = node4;
+    // node1 = null;
+    // console.log(node4);
+    // node1.getNode();
+    // node1.setValue('Z');
+    // node1.getNode();
+</script>
+</html>

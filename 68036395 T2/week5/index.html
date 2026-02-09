@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+
+</style>
+<body>
+   <h1>LinkedList-Function Demo</h1>
+   <div>
+   <label >Data: </label>
+    <input type="text">
+    <label >index: </label>
+    <input type="number">
+    </div>
+    <button onclick="push()">push</button>
+    <button onclick="pop()">pop</button>
+    <button onclick="unshift()">unshift</button>
+    <button onclick="ship()">ship</button>
+    <button onclick="get()">get</button>
+    <button onclick="set()">set</button>
+    <button onclick="insert()">insert</button>
+    <button onclick="remove()">remove</button>
+    <br>
+    <br>
+    <div>
+        <label >Result</label>
+    </div>
+    <script>
+        class Node {
+    constructor(value = "x") {
+        this.value = value;
+        this.next = null;
+    }
+
+    setValue(value) {
+        this.value = value;
+    }
+
+    getNode() {
+        console.log("[" + this.value + "|" + this.next + "]");
+    }
+}
+
+        class LinkedList {
+    constructor() {
+        this.head = null;
+        this.last = this.head;
+    }
+    ship() {   
+        if (this.head == null) {
+            console.log("List is empty");
+            return;
+        }
+
+        this.head = this.head.next;
+    }
+
+    unship(value){
+    let newNode = new Node(value);
+
+    if(this.head == null){
+        this.head = newNode;
+    } else {
+        newNode.next = this.head;
+        this.head = newNode;
+    }
+}
+
+    push(value){
+            let newNode = new Node(value);
+            let tmp = this.head;
+            if(tmp == null)
+                this.head = newNode;
+            else{
+                while(tmp.next !=null ){
+                    tmp = tmp.next;
+                }
+                tmp.next = newNode;
+            }
+        }
+    pop(value){
+            if(this.head != null){
+                if(this.head.next == null){
+                    this.head = null;
+                }else{
+                    let current= this.head.next;
+                    let tmp = this.head;
+                    while(current.next!=null){
+                        tmp = current;
+                        current = current.next;
+                    }
+                    tmp.next = null;
+                }
+            }else console.log("can't pop() in List...");
+        }
+    getList() {
+        if (this.head == null)
+            return "List is Empty ! \n[ ]";
+        else {
+            let result = "List is not Empty \n";
+            let tmp = this.head;
+
+            result += "[" + tmp.value + "]-->";
+
+            while (tmp.next != null) {
+                tmp = tmp.next;
+                result += "[" + tmp.value + "]-->";
+            }
+
+            return result + "null";
+        }
+    }
+}
+let list = new LinkedList();
+    console.log(list.getList());
+    list.unship('A');
+    list.unship('B');
+    list.unship('C');
+    console.log(list.getList());
+    list.ship();list.ship();list.ship();
+    console.log(list.getList());
+    list.push(10);list.push(20);list.push(30);
+    console.log(list.getList());
+    list.pop();list.pop();list.pop();
+    console.log(list.getList());
+
+        
+        
+    </script>
+</html>

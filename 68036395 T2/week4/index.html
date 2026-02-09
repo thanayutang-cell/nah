@@ -41,10 +41,21 @@
             }
         }
         remove(index){
-            
+            let newNode = new Node(value);
+            let tmp = this.head;
+            if(tmp == null)
+            this.head = null;
         }
         setValue(index,value){
-
+            let newNode = new Node(value);
+            if(this.last == null)
+                this.head = this.last = newNode;
+            else{
+                newNode.next= this.last
+                this.last = newNode
+            }
+            this.last.next = newNode;
+            this.last =newNodes;
         }
         get(index){
             if(this.head !=null)
@@ -109,23 +120,23 @@
         //     console.log("can't ship()in List...");
         // else{
         //     this.head = this.head.next;
-        }
+        // }
         }
         getList(){
             if(this.head == null)
-            return"List is Empty ! \n[ ]";
+            return"List is Empty ! \n[ ]"
         else{
-            let result ="List is not Empty \n";
+            let result ="List is not Empty \n"
             let tmp = this.head;
-            result += "["+tmp.value+"]-->";
+            result += "["+tmp.value+"]-->"
                 while(tmp.next !=null){
-                    tmp = tmp.next;
-                    result += "["+tmp.value+"]-->";
+                    tmp = tmp.next
+                    result += "["+tmp.value+"]-->"
                 }
-            return result+null;
+            return result+"null"
         }
     }
-    
+}
     let list = new LinkedList();
     console.log(list.getList());
     list.unship('A');

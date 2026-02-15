@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LinkedList Function Demo</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      background: white;
+      color: #222;
+    }
+
+    h2 {
+      font-weight: normal;
+      margin-bottom: 25px;
+    }
+
+    .inputs {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-size: 14px;
+    }
+
+    input {
+      width: 140px;
+      padding: 5px;
+      margin-left: 5px;
+      border: 1px solid #aaa;
+    }
+
+    .buttons {
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 5px 10px;
+      margin: 3px;
+      border: 1px solid #aaa;
+      background: #f2f2f2;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    button:hover {
+      background: #ddd;
+    }
+
+    .resultBox {
+      margin-top: 30px;
+      font-size: 14px;
+    }
+
+    .resultBox p {
+      margin: 8px 0;
+    }
+
+    .blue {
+      color: blue;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>LinkedList – Function Demo</h2>
+
+  <!-- Inputs -->
+  <div class="inputs">
+    <div>
+      <label>Data:</label>
+      <input type="text" id="dataInput" value="D">
+    </div>
+
+    <div>
+      <label>Index:</label>
+      <input type="number" id="indexInput" value="0">
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="buttons">
+    <button onclick="pushData()">push</button>
+    <button onclick="popData()">pop</button>
+    <button onclick="unshiftData()">unshift</button>
+    <button onclick="shiftData()">shift</button>
+    <button onclick="getData()">get(index)</button>
+    <button onclick="setData()">set(index)</button>
+    <button onclick="insertData()">insert(index)</button>
+    <button onclick="removeData()">remove(index)</button>
+  </div>
+
+  <!-- Result -->
+  <div class="resultBox">
+    <p>Result:</p>
+    <p class="blue" id="resultText">push(D)</p>
+
+    <p>LinkedList:</p>
+    <p id="listText">[A, B, C, D]</p>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Start LinkedList (Array demo)
+    let list = ["A", "B", "C"];
+
+    // Render List
+    function render() {
+      document.getElementById("listText").innerText =
+        "[" + list.join(", ") + "]";
+    }
+
+    function showResult(text) {
+      document.getElementById("resultText").innerText = text;
+      render();
+    }
+
+    // Functions
+    function pushData() {
+      let data = document.getElementById("dataInput").value;
+      list.push(data);
+      showResult(`push(${data})`);
+    }
+
+    function popData() {
+      let removed = list.pop();
+      showResult(`pop() → ${removed}`);
+    }
+
+    function unshiftData() {
+      let data = document.getElementById("dataInput").value;
+      list.unshift(data);
+      showResult(`unshift(${data})`);
+    }
+
+    function shiftData() {
+      let removed = list.shift();
+      showResult(`shift() → ${removed}`);
+    }
+
+    function getData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let value = list[index];
+      showResult(`get(${index}) → ${value}`);
+    }
+
+    function setData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let data = document.getElementById("dataInput").value;
+
+      list[index] = data;
+      showResult(`set(${index}, ${data})`);
+    }
+
+    function insertData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let data = document.getElementById("dataInput").value;
+
+      list.splice(index, 0, data);
+      showResult(`insert(${index}, ${data})`);
+    }
+
+    function removeData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let removed = list.splice(index, 1);
+
+      showResult(`remove(${index}) → ${removed}`);
+    }
+
+    // Initial render
+    render();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LinkedList Visual Demo</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f8f8f8;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 20px;
+    }
+
+    input {
+      padding: 6px;
+      width: 120px;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin: 4px;
+      cursor: pointer;
+      border: 1px solid #aaa;
+      background: white;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background: #eee;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 10px;
+      background: white;
+      border: 1px solid #ddd;
+    }
+
+    .visual {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .node {
+      width: 60px;
+      height: 50px;
+      background: #c77;
+      color: white;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 6px;
+      position: relative;
+    }
+
+    .node small {
+      position: absolute;
+      bottom: -18px;
+      font-size: 11px;
+      color: black;
+    }
+
+    .arrow {
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>LinkedList – Visual & Function Demo</h1>
+
+  <!-- Input Section -->
+  <div class="controls">
+    <div>
+      <label>Data:</label>
+      <input type="text" id="dataInput" value="C">
+    </div>
+
+    <div>
+      <label>Index:</label>
+      <input type="number" id="indexInput" value="0">
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div style="margin-top: 15px;">
+    <button onclick="pushData()">push</button>
+    <button onclick="popData()">pop</button>
+    <button onclick="unshiftData()">unshift</button>
+    <button onclick="shiftData()">shift</button>
+    <button onclick="getData()">get</button>
+    <button onclick="setData()">set</button>
+    <button onclick="insertData()">insert</button>
+    <button onclick="removeData()">remove</button>
+  </div>
+
+  <!-- Result -->
+  <div class="result">
+    <p><b>Result:</b></p>
+    <p id="resultText">push(C)</p>
+
+    <p><b>LinkedList Structure:</b></p>
+    <div class="visual" id="visualList"></div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // LinkedList Data
+    let list = ["A", "B"];
+
+    // Update UI
+    function render() {
+      let visual = document.getElementById("visualList");
+      visual.innerHTML = "";
+
+      list.forEach((value, i) => {
+        // Node Box
+        let node = document.createElement("div");
+        node.className = "node";
+        node.innerHTML = value;
+
+        let label = document.createElement("small");
+        label.innerText = (i === list.length - 1) ? "null" : "next";
+        node.appendChild(label);
+
+        visual.appendChild(node);
+
+        // Arrow
+        if (i < list.length - 1) {
+          let arrow = document.createElement("div");
+          arrow.className = "arrow";
+          arrow.innerText = "→";
+          visual.appendChild(arrow);
+        }
+      });
+    }
+
+    function showResult(text) {
+      document.getElementById("resultText").innerText = text;
+      render();
+    }
+
+    // Functions
+    function pushData() {
+      let data = document.getElementById("dataInput").value;
+      list.push(data);
+      showResult(`push(${data})`);
+    }
+
+    function popData() {
+      let removed = list.pop();
+      showResult(`pop() → removed ${removed}`);
+    }
+
+    function unshiftData() {
+      let data = document.getElementById("dataInput").value;
+      list.unshift(data);
+      showResult(`unshift(${data})`);
+    }
+
+    function shiftData() {
+      let removed = list.shift();
+      showResult(`shift() → removed ${removed}`);
+    }
+
+    function getData() {
+      let index = document.getElementById("indexInput").value;
+      let value = list[index];
+      showResult(`get(${index}) → ${value}`);
+    }
+
+    function setData() {
+      let index = document.getElementById("indexInput").value;
+      let data = document.getElementById("dataInput").value;
+      list[index] = data;
+      showResult(`set(${index}, ${data})`);
+    }
+
+    function insertData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let data = document.getElementById("dataInput").value;
+      list.splice(index, 0, data);
+      showResult(`insert(${index}, ${data})`);
+    }
+
+    function removeData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let removed = list.splice(index, 1);
+      showResult(`remove(${index}) → removed ${removed}`);
+    }
+
+    // Start
+    render();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Management LinkedList</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #fff;
+    }
+
+    h2 {
+      font-weight: normal;
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      padding: 5px;
+      border: 1px solid #aaa;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 5px 10px;
+      border: 1px solid #aaa;
+      background: #f2f2f2;
+      cursor: pointer;
+      margin: 2px;
+    }
+
+    button:hover {
+      background: #ddd;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .resultBox {
+      margin-top: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+    }
+
+    .visualBox {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+
+    .listRow {
+      margin-top: 10px;
+    }
+
+    .node {
+      display: inline-block;
+      width: 60px;
+      height: 50px;
+      background: #b55;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      line-height: 50px;
+      border-radius: 6px;
+      position: relative;
+    }
+
+    .node small {
+      position: absolute;
+      bottom: -18px;
+      left: 0;
+      width: 100%;
+      font-size: 11px;
+      color: black;
+    }
+
+    .arrow {
+      display: inline-block;
+      font-size: 20px;
+      margin: 0 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Management LinkedList (Multiple Lists)</h2>
+
+  <!-- Create List -->
+  <div class="section">
+    <label>New List Name:</label>
+    <input type="text" id="newListName" placeholder="A">
+    <button onclick="createList()">Create List</button>
+  </div>
+
+  <!-- Select List -->
+  <div class="section">
+    <label>Select List:</label>
+    <select id="listSelect"></select>
+    <button onclick="deleteList()">Delete List</button>
+  </div>
+
+  <!-- Data Control -->
+  <div class="section">
+    <label>Data:</label>
+    <input type="text" id="dataInput" value="XXX">
+
+    <label>Index:</label>
+    <input type="number" id="indexInput" value="2">
+
+    <br><br>
+
+    <button onclick="pushData()">push</button>
+    <button onclick="popData()">pop</button>
+    <button onclick="unshiftData()">unshift</button>
+    <button onclick="shiftData()">shift</button>
+    <button onclick="getData()">get</button>
+    <button onclick="setData()">set</button>
+    <button onclick="insertData()">insert</button>
+    <button onclick="removeData()">remove</button>
+  </div>
+
+  <!-- Result -->
+  <div class="resultBox">
+    <p><b>Result:</b></p>
+    <p id="resultText">insert</p>
+
+    <p><b>LinkedList Structure:</b></p>
+    <div id="visualArea"></div>
+  </div>
+
+  <script>
+    // Multiple Lists Storage
+    let lists = {
+      A: [100, 100, 200],
+      B: [400, 300, "XXX", 200, 100]
+    };
+
+    // Render Dropdown
+    function renderSelect() {
+      let select = document.getElementById("listSelect");
+      select.innerHTML = "";
+
+      Object.keys(lists).forEach(name => {
+        let option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+
+      renderVisual();
+    }
+
+    // Render Visual LinkedLists
+    function renderVisual() {
+      let area = document.getElementById("visualArea");
+      area.innerHTML = "";
+
+      Object.keys(lists).forEach(name => {
+        let row = document.createElement("div");
+        row.className = "listRow";
+
+        row.innerHTML = `<b>${name}</b><br>`;
+
+        lists[name].forEach((val, i) => {
+          let node = document.createElement("div");
+          node.className = "node";
+          node.innerHTML = val;
+
+          let label = document.createElement("small");
+          label.innerText = (i === lists[name].length - 1) ? "null" : "next";
+          node.appendChild(label);
+
+          row.appendChild(node);
+
+          if (i < lists[name].length - 1) {
+            let arrow = document.createElement("span");
+            arrow.className = "arrow";
+            arrow.innerText = "→";
+            row.appendChild(arrow);
+          }
+        });
+
+        area.appendChild(row);
+      });
+    }
+
+    // Show Result
+    function showResult(text) {
+      document.getElementById("resultText").innerText = text;
+      renderVisual();
+    }
+
+    // Create List
+    function createList() {
+      let name = document.getElementById("newListName").value.trim();
+      if (name === "" || lists[name]) return alert("Invalid Name!");
+
+      lists[name] = [];
+      renderSelect();
+      showResult(`Create List ${name}`);
+    }
+
+    // Delete List
+    function deleteList() {
+      let selected = document.getElementById("listSelect").value;
+      delete lists[selected];
+      renderSelect();
+      showResult(`Delete List ${selected}`);
+    }
+
+    // Get Current List
+    function currentList() {
+      let selected = document.getElementById("listSelect").value;
+      return lists[selected];
+    }
+
+    // Operations
+    function pushData() {
+      let data = document.getElementById("dataInput").value;
+      currentList().push(data);
+      showResult(`push(${data})`);
+    }
+
+    function popData() {
+      let removed = currentList().pop();
+      showResult(`pop() → ${removed}`);
+    }
+
+    function unshiftData() {
+      let data = document.getElementById("dataInput").value;
+      currentList().unshift(data);
+      showResult(`unshift(${data})`);
+    }
+
+    function shiftData() {
+      let removed = currentList().shift();
+      showResult(`shift() → ${removed}`);
+    }
+
+    function getData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let value = currentList()[index];
+      showResult(`get(${index}) → ${value}`);
+    }
+
+    function setData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let data = document.getElementById("dataInput").value;
+      currentList()[index] = data;
+      showResult(`set(${index}, ${data})`);
+    }
+
+    function insertData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let data = document.getElementById("dataInput").value;
+      currentList().splice(index, 0, data);
+      showResult(`insert(${index}, ${data})`);
+    }
+
+    function removeData() {
+      let index = parseInt(document.getElementById("indexInput").value);
+      let removed = currentList().splice(index, 1);
+      showResult(`remove(${index}) → ${removed}`);
+    }
+
+    // Start
+    renderSelect();
+  </script>
+
+</body>
+</html>

@@ -1,268 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedList Demo</title>
 </head>
-<style>
 
-</style>
 <body>
-   <h1>LinkedList-Function Demo</h1>
-   <div>
-   <label >Data: </label>
-    <input type="text">
-    <label >index: </label>
-    <input type="number">
-    </div>
-    <button onclick="push()">push</button>
-    <button onclick="pop()">pop</button>
-    <button onclick="unshift()">unshift</button>
-    <button onclick="ship()">ship</button>
-    <button onclick="get()">get</button>
-    <button onclick="set()">set</button>
-    <button onclick="insert()">insert</button>
-    <button onclick="remove()">remove</button>
-    <br>
-    <br>
-    <div>
-        <label >Result</label>
-    </div>
-    <script>
-  // ===============================
-// ✅ Node Class
-// ===============================
-class Node {
-  constructor(data) {
-    this.data = data;
-    this.next = null;
-  }
-}
+  <h1>LinkedList-Function Demo</h1>
 
-// ===============================
-// ✅ LinkedList Class
-// ===============================
-class LinkedList {
-  constructor() {
-    this.head = null;
-    this.tail = null;
-    this.length = 0;
-  }
+  <div>
+    <label>Data: </label>
+    <input type="text" id="dataInput">
 
-  // ✅ push(data) เพิ่มท้าย
-  push(data) {
-    let newNode = new Node(data);
+    <label>Index: </label>
+    <input type="number" id="indexInput">
+  </div>
 
-    if (!this.head) {
-      this.head = newNode;
-      this.tail = newNode;
-    } else {
-      this.tail.next = newNode;
-      this.tail = newNode;
+  <br>
+
+  <button onclick="doPush()">push</button>
+  <button onclick="doPop()">pop</button>
+  <button onclick="doUnshift()">unshift</button>
+  <button onclick="doShift()">shift</button>
+  <button onclick="doGet()">get</button>
+  <button onclick="doSet()">set</button>
+  <button onclick="doInsert()">insert</button>
+  <button onclick="doRemove()">remove</button>
+
+  <br><br>
+
+  <h3>Result:</h3>
+  <p id="result"></p>
+
+  <script>
+    // ✅ Node class
+    class Node {
+      constructor(data) {
+        this.data = data;
+        this.next = null;
+      }
     }
 
-    this.length++;
-  }
+    // ✅ LinkedList class
+    class LinkedList {
+      constructor() {
+        this.head = null;
+        this.tail = null;
+        this.length = 0;
+      }
 
-  // ✅ pop() ลบท้าย
-  pop() {
-    if (!this.head) return null;
+      push(data) {
+        let newNode = new Node(data);
 
-    let current = this.head;
-    let prev = null;
+        if (!this.head) {
+          this.head = newNode;
+          this.tail = newNode;
+        } else {
+          this.tail.next = newNode;
+          this.tail = newNode;
+        }
 
-    while (current.next) {
-      prev = current;
-      current = current.next;
+        this.length++;
+      }
+
+      pop() {
+        if (!this.head) return null;
+
+        let current = this.head;
+        let prev = null;
+
+        while (current.next) {
+          prev = current;
+          current = current.next;
+        }
+
+        if (prev) {
+          prev.next = null;
+          this.tail = prev;
+        } else {
+          this.head = null;
+          this.tail = null;
+        }
+
+        this.length--;
+        return current.data;
+      }
+
+      unshift(data) {
+        let newNode = new Node(data);
+
+        if (!this.head) {
+          this.head = newNode;
+          this.tail = newNode;
+        } else {
+          newNode.next = this.head;
+          this.head = newNode;
+        }
+
+        this.length++;
+      }
+
+      shift() {
+        if (!this.head) return null;
+
+        let removed = this.head;
+        this.head = this.head.next;
+
+        if (!this.head) this.tail = null;
+
+        this.length--;
+        return removed.data;
+      }
+
+      get(index) {
+        if (index < 0 || index >= this.length) return null;
+
+        let current = this.head;
+        let count = 0;
+
+        while (count < index) {
+          current = current.next;
+          count++;
+        }
+
+        return current.data;
+      }
+
+      set(index, newData) {
+        let current = this.head;
+        let count = 0;
+
+        while (count < index) {
+          current = current.next;
+          count++;
+        }
+
+        current.data = newData;
+        return true;
+      }
+
+      insert(index, data) {
+        if (index < 0 || index > this.length) return false;
+
+        if (index === 0) return this.unshift(data);
+        if (index === this.length) return this.push(data);
+
+        let newNode = new Node(data);
+
+        let prev = this.head;
+        let count = 0;
+
+        while (count < index - 1) {
+          prev = prev.next;
+          count++;
+        }
+
+        newNode.next = prev.next;
+        prev.next = newNode;
+
+        this.length++;
+      }
+
+      remove(index) {
+        if (index === 0) return this.shift();
+        if (index === this.length - 1) return this.pop();
+
+        let prev = this.head;
+        let count = 0;
+
+        while (count < index - 1) {
+          prev = prev.next;
+          count++;
+        }
+
+        let removed = prev.next;
+        prev.next = removed.next;
+
+        this.length--;
+        return removed.data;
+      }
+
+      print() {
+        let arr = [];
+        let current = this.head;
+
+        while (current) {
+          arr.push(current.data);
+          current = current.next;
+        }
+
+        return arr.join(" -> ");
+      }
     }
 
-    if (prev) {
-      prev.next = null;
-      this.tail = prev;
-    } else {
-      this.head = null;
-      this.tail = null;
+    // ✅ Create LinkedList object
+    let list = new LinkedList();
+
+    // ✅ Helper function show result
+    function showResult(text) {
+      document.getElementById("result").innerText =
+        text + "\nList: " + list.print();
     }
 
-    this.length--;
-    return current.data;
-  }
-
-  // ✅ unshift(data) เพิ่มหัว
-  unshift(data) {
-    let newNode = new Node(data);
-
-    if (!this.head) {
-      this.head = newNode;
-      this.tail = newNode;
-    } else {
-      newNode.next = this.head;
-      this.head = newNode;
+    // ✅ Button functions
+    function doPush() {
+      let data = document.getElementById("dataInput").value;
+      list.push(data);
+      showResult("Push: " + data);
     }
 
-    this.length++;
-  }
-
-  // ✅ shift() ลบหัว
-  shift() {
-    if (!this.head) return null;
-
-    let removed = this.head;
-    this.head = this.head.next;
-
-    if (!this.head) this.tail = null;
-
-    this.length--;
-    return removed.data;
-  }
-
-  // ✅ get(index) ดึงค่าตามตำแหน่ง
-  get(index) {
-    if (index < 0 || index >= this.length) return null;
-
-    let current = this.head;
-    let count = 0;
-
-    while (count < index) {
-      current = current.next;
-      count++;
+    function doPop() {
+      let removed = list.pop();
+      showResult("Pop: " + removed);
     }
 
-    return current.data;
-  }
-
-  // ✅ set(index,newData) แก้ค่าตามตำแหน่ง
-  set(index, newData) {
-    if (index < 0 || index >= this.length) return false;
-
-    let current = this.head;
-    let count = 0;
-
-    while (count < index) {
-      current = current.next;
-      count++;
+    function doUnshift() {
+      let data = document.getElementById("dataInput").value;
+      list.unshift(data);
+      showResult("Unshift: " + data);
     }
 
-    current.data = newData;
-    return true;
-  }
-
-  // ✅ insert(index,data) แทรกข้อมูล
-  insert(index, data) {
-    if (index < 0 || index > this.length) return false;
-
-    if (index === 0) {
-      this.unshift(data);
-      return true;
+    function doShift() {
+      let removed = list.shift();
+      showResult("Shift: " + removed);
     }
 
-    if (index === this.length) {
-      this.push(data);
-      return true;
+    function doGet() {
+      let index = Number(document.getElementById("indexInput").value);
+      showResult("Get: " + list.get(index));
     }
 
-    let newNode = new Node(data);
-    let prev = this.head;
-    let count = 0;
-
-    while (count < index - 1) {
-      prev = prev.next;
-      count++;
+    function doSet() {
+      let index = Number(document.getElementById("indexInput").value);
+      let data = document.getElementById("dataInput").value;
+      list.set(index, data);
+      showResult("Set index " + index + " = " + data);
     }
 
-    newNode.next = prev.next;
-    prev.next = newNode;
-
-    this.length++;
-    return true;
-  }
-
-  // ✅ remove(index) ลบข้อมูลตำแหน่งที่กำหนด
-  remove(index) {
-    if (index < 0 || index >= this.length) return null;
-
-    if (index === 0) return this.shift();
-    if (index === this.length - 1) return this.pop();
-
-    let prev = this.head;
-    let count = 0;
-
-    while (count < index - 1) {
-      prev = prev.next;
-      count++;
+    function doInsert() {
+      let index = Number(document.getElementById("indexInput").value);
+      let data = document.getElementById("dataInput").value;
+      list.insert(index, data);
+      showResult("Insert " + data + " at index " + index);
     }
 
-    let removedNode = prev.next;
-    prev.next = removedNode.next;
-
-    this.length--;
-    return removedNode.data;
-  }
-
-  // ✅ แสดงข้อมูลทั้งหมดใน List
-  print() {
-    let arr = [];
-    let current = this.head;
-
-    while (current) {
-      arr.push(current.data);
-      current = current.next;
+    function doRemove() {
+      let index = Number(document.getElementById("indexInput").value);
+      let removed = list.remove(index);
+      showResult("Remove index " + index + ": " + removed);
     }
-
-    console.log("LinkedList =", arr.join(" -> "));
-  }
-}
-
-// ===============================
-// ✅ Example Usage (ตามโจทย์)
-// ===============================
-
-// list = [listA, listB]
-let listA = new LinkedList();
-let listB = new LinkedList();
-
-// listA = [100]
-listA.push(100);
-
-// listB = []
-console.log("listA:");
-listA.print();
-
-console.log("listB:");
-listB.print();
-
-// ===============================
-// ทดลองคำสั่งทั้งหมด
-// ===============================
-listA.push(200);
-listA.unshift(50);
-
-console.log("\nAfter push + unshift:");
-listA.print();
-
-listA.pop();
-console.log("\nAfter pop:");
-listA.print();
-
-listA.shift();
-console.log("\nAfter shift:");
-listA.print();
-
-console.log("\nget(0) =", listA.get(0));
-
-listA.set(0, 999);
-console.log("\nAfter set(0,999):");
-listA.print();
-
-listA.insert(1, 77);
-console.log("\nAfter insert(1,77):");
-listA.print();
-
-listA.remove(1);
-console.log("\nAfter remove(1):");
-listA.print();
-
-
-    </script>
+  </script>
+</body>
 </html>

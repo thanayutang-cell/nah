@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Structure Visualization</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+button {
+    padding: 6px 12px;
+    margin: 5px 5px 5px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #e0e0e0;
+}
+
+button:hover {
+    background: #d0d0d0;
+}
+
+input {
+    padding: 6px;
+    width: 200px;
+    margin-right: 10px;
+}
+
+.structure {
+    margin-top: 15px;
+    background: #f1f3f6;
+    padding: 10px;
+    min-height: 100px;
+    border-radius: 5px;
+}
+
+.box {
+    padding: 8px;
+    margin: 5px 0;
+    background: #4caf50;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.queue-box {
+    display: inline-block;
+    padding: 8px;
+    margin: 5px;
+    background: #2196f3;
+    color: white;
+    border-radius: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Data Structure Visualization</h1>
+
+<div style="text-align:center;">
+    <input type="text" id="dataInput" placeholder="กรอกข้อมูล">
+</div>
+
+<div class="container">
+
+    <!-- STACK -->
+    <div class="card">
+        <h2>STACK (LIFO)</h2>
+
+        <button onclick="pushStack()">Push</button>
+        <button onclick="popStack()">Pop</button>
+        <button onclick="topStack()">Top</button>
+        <button onclick="clearStack()">Clear</button>
+
+        <p><b>Result:</b> <span id="stackResult">-</span></p>
+
+        <div class="structure" id="stackDisplay">
+            <i>Empty</i>
+        </div>
+    </div>
+
+    <!-- QUEUE -->
+    <div class="card">
+        <h2>QUEUE (FIFO)</h2>
+
+        <button onclick="enqueue()">Enqueue</button>
+        <button onclick="dequeue()">Dequeue</button>
+        <button onclick="frontQueue()">Front</button>
+        <button onclick="clearQueue()">Clear</button>
+
+        <p><b>Result:</b> <span id="queueResult">-</span></p>
+
+        <div class="structure" id="queueDisplay">
+            <i>Empty</i>
+        </div>
+    </div>
+
+</div>
+
+<script>
+let stack = [];
+let queue = [];
+
+/* ---------------- STACK ---------------- */
+
+function pushStack() {
+    let value = document.getElementById("dataInput").value;
+    if(value === "") return;
+    stack.push(value);
+    updateStack();
+}
+
+function popStack() {
+    if(stack.length === 0) {
+        document.getElementById("stackResult").innerText = "Stack is Empty";
+        return;
+    }
+    let removed = stack.pop();
+    document.getElementById("stackResult").innerText = "Pop: " + removed;
+    updateStack();
+}
+
+function topStack() {
+    if(stack.length === 0) {
+        document.getElementById("stackResult").innerText = "Stack is Empty";
+        return;
+    }
+    document.getElementById("stackResult").innerText = "Top: " + stack[stack.length - 1];
+}
+
+function clearStack() {
+    stack = [];
+    updateStack();
+    document.getElementById("stackResult").innerText = "-";
+}
+
+function updateStack() {
+    let display = document.getElementById("stackDisplay");
+    display.innerHTML = "";
+
+    if(stack.length === 0) {
+        display.innerHTML = "<i>Empty</i>";
+        return;
+    }
+
+    for(let i = stack.length - 1; i >= 0; i--) {
+        let div = document.createElement("div");
+        div.className = "box";
+        div.innerText = stack[i];
+        display.appendChild(div);
+    }
+}
+
+/* ---------------- QUEUE ---------------- */
+
+function enqueue() {
+    let value = document.getElementById("dataInput").value;
+    if(value === "") return;
+    queue.push(value);
+    updateQueue();
+}
+
+function dequeue() {
+    if(queue.length === 0) {
+        document.getElementById("queueResult").innerText = "Queue is Empty";
+        return;
+    }
+    let removed = queue.shift();
+    document.getElementById("queueResult").innerText = "Dequeue: " + removed;
+    updateQueue();
+}
+
+function frontQueue() {
+    if(queue.length === 0) {
+        document.getElementById("queueResult").innerText = "Queue is Empty";
+        return;
+    }
+    document.getElementById("queueResult").innerText = "Front: " + queue[0];
+}
+
+function clearQueue() {
+    queue = [];
+    updateQueue();
+    document.getElementById("queueResult").innerText = "-";
+}
+
+function updateQueue() {
+    let display = document.getElementById("queueDisplay");
+    display.innerHTML = "";
+
+    if(queue.length === 0) {
+        display.innerHTML = "<i>Empty</i>";
+        return;
+    }
+
+    queue.forEach(item => {
+        let div = document.createElement("div");
+        div.className = "queue-box";
+        div.innerText = item;
+        display.appendChild(div);
+    });
+}
+</script>
+
+</body>
+</html>

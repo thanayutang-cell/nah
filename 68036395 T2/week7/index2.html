@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    let exp = "A + B";
+    let upexp = " ";
+    for( let index = 0 ; index <= exp.length-1 ; index++ ){
+    //     console.log("index :",index,"=",exp.charAt(index));
+    // upexp = upexp + exp.charAt()
+    if(exp.charAt(index) !=' ')
+        upexp += exp.charAt(index)
+    }
+    console.log("Before :",exp);
+    console.log("After :",upexp);
+    exp = upexp;
+    function infixtoPostfix(exps){
+        console.log("Exptresstion: ",exps,"Length",exps.length)
+        stack = [];
+        Output = '';
+        index = 0;
+        // if(index < exp.length){
+
+        // }else{
+        //     console.log("Your Not inserch expresstion")
+        // }
+        while(index < exps.length){
+            if(exps.charAt(index)=='*'&&xeps.charAt(index+1)=='*'){
+                char = '**';
+                index++
+            }else if(char.math(/[A-Za-z0-9]/)){
+                console.log("funct...finding Operland ");
+                Output += char ;
+            }else if(char == ')'){
+                console.log("funct...finding (");
+                stack.push(char);
+            }else if(char == ')'){
+                console.log("funct...finding )");
+                let temp ='';
+                do{
+                    temp = stack.pop();
+                    if(temp !='()')
+                }while
+            }
+            console.log(stack);
+            console.log("char :",char);
+            console.log("output: ",output);
+            index++;
+        }
+        return Output+". . .";
+    }
+    infixtoPostfix('A+B**')
+</script>
+</html>

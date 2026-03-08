@@ -2,70 +2,77 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Infix to Postfix Converter</title>
+<title>Infix to Postfix Visualizer</title>
 
 <style>
 
 body{
-    font-family: Arial, Helvetica, sans-serif;
-    background: linear-gradient(135deg,#667eea,#764ba2);
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+font-family: Arial;
+background: linear-gradient(135deg,#667eea,#764ba2);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
 }
 
 .container{
-    background:white;
-    padding:40px;
-    border-radius:15px;
-    width:420px;
-    text-align:center;
-    box-shadow:0 10px 30px rgba(0,0,0,0.2);
-}
-
-h1{
-    margin-bottom:20px;
+background:white;
+padding:35px;
+border-radius:15px;
+width:600px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+text-align:center;
 }
 
 input{
-    width:90%;
-    padding:12px;
-    font-size:16px;
-    border-radius:8px;
-    border:1px solid #ccc;
-    margin-bottom:15px;
+width:80%;
+padding:10px;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:16px;
 }
 
 button{
-    background:#667eea;
-    color:white;
-    border:none;
-    padding:12px 20px;
-    font-size:16px;
-    border-radius:8px;
-    cursor:pointer;
-    transition:0.3s;
+margin-top:10px;
+padding:10px 18px;
+border:none;
+background:#667eea;
+color:white;
+border-radius:8px;
+cursor:pointer;
 }
 
 button:hover{
-    background:#4c5fd7;
+background:#4c5fd7;
 }
 
 .result{
-    margin-top:20px;
-    padding:15px;
-    background:#f3f3f3;
-    border-radius:8px;
-    font-size:18px;
-    font-weight:bold;
+margin-top:15px;
+padding:10px;
+background:#f1f1f1;
+border-radius:8px;
+font-size:18px;
 }
 
-.stackBox{
-    margin-top:20px;
-    font-size:14px;
-    color:#555;
+table{
+margin-top:20px;
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+
+th{
+background:#667eea;
+color:white;
+}
+
+tr:nth-child(even){
+background:#f9f9f9;
 }
 
 </style>
@@ -75,9 +82,9 @@ button:hover{
 
 <div class="container">
 
-<h1>Infix → Postfix</h1>
+<h2>Infix → Postfix Visualizer</h2>
 
-<input id="expression" placeholder="Example: A+(B*C)" />
+<input id="expression" placeholder="Example: A+(B*C)">
 
 <br>
 
@@ -87,101 +94,108 @@ button:hover{
 Postfix : <span id="output">-</span>
 </div>
 
-<div class="stackBox">
-Stack: <span id="stackView">[]</span>
-</div>
+<table id="stepTable">
+<tr>
+<th>Index</th>
+<th>Char</th>
+<th>Stack</th>
+<th>Output</th>
+</tr>
+</table>
 
 </div>
 
 <script>
 
-// precedence function
-function getPrecedence(op){
-
-    if(op == '+' || op == '-')
-        return 1
-
-    if(op == '*' || op == '/')
-        return 2
-
-    if(op == '^')
-        return 3
-
-    return 0
+function precedence(op){
+if(op=='+'||op=='-') return 1
+if(op=='*'||op=='/') return 2
+if(op=='^') return 3
+return 0
 }
 
-
-// check operand
 function isOperand(ch){
-    return /[A-Za-z0-9]/.test(ch)
+return /^[A-Za-z0-9]$/.test(ch)
 }
 
-
-// infix to postfix
-function infixToPostfix(expression){
-
-    let stack = []
-    let output = ""
-
-    for(let i=0;i<expression.length;i++){
-
-        let char = expression[i]
-
-        // operand
-        if(isOperand(char)){
-            output += char
-        }
-
-        // (
-        else if(char == '('){
-            stack.push(char)
-        }
-
-        // )
-        else if(char == ')'){
-
-            while(stack.length && stack[stack.length-1] != '('){
-                output += stack.pop()
-            }
-
-            stack.pop()
-        }
-
-        // operator
-        else{
-
-            while(
-                stack.length &&
-                getPrecedence(stack[stack.length-1]) >= getPrecedence(char)
-            ){
-                output += stack.pop()
-            }
-
-            stack.push(char)
-        }
-    }
-
-    while(stack.length){
-        output += stack.pop()
-    }
-
-    return {
-        postfix:output,
-        stack:stack
-    }
-}
-
-
-// convert button
 function convert(){
 
-    let exp = document.getElementById("expression").value.replace(/\s/g,'')
+let exp=document.getElementById("expression").value.replace(/\s/g,'')
 
-    let result = infixToPostfix(exp)
+let stack=[]
+let output=""
 
-    document.getElementById("output").innerText = result.postfix
+let table=document.getElementById("stepTable")
 
-    document.getElementById("stackView").innerText = JSON.stringify(result.stack)
+table.innerHTML=
+`<tr>
+<th>Index</th>
+<th>Char</th>
+<th>Stack</th>
+<th>Output</th>
+</tr>`
+
+for(let i=0;i<exp.length;i++){
+
+let char=exp[i]
+
+if(isOperand(char)){
+output+=char
+}
+
+else if(char=='('){
+stack.push(char)
+}
+
+else if(char==')'){
+
+while(stack.length && stack[stack.length-1]!='('){
+output+=stack.pop()
+}
+
+stack.pop()
+
+}
+
+else{
+
+while(stack.length && precedence(stack[stack.length-1])>=precedence(char)){
+output+=stack.pop()
+}
+
+stack.push(char)
+
+}
+
+let row=`
+<tr>
+<td>${i}</td>
+<td>${char}</td>
+<td>${stack.join(" ")}</td>
+<td>${output}</td>
+</tr>
+`
+
+table.innerHTML+=row
+
+}
+
+while(stack.length){
+output+=stack.pop()
+
+let row=`
+<tr>
+<td>-</td>
+<td>POP</td>
+<td>${stack.join(" ")}</td>
+<td>${output}</td>
+</tr>
+`
+
+table.innerHTML+=row
+}
+
+document.getElementById("output").innerText=output
 
 }
 

@@ -19,7 +19,7 @@ align-items:center;
 background:white;
 padding:35px;
 border-radius:15px;
-width:600px;
+width:650px;
 box-shadow:0 10px 25px rgba(0,0,0,0.2);
 text-align:center;
 }
@@ -84,7 +84,7 @@ background:#f9f9f9;
 
 <h2>Infix → Postfix Visualizer</h2>
 
-<input id="expression" placeholder="Example: A+(B*C)">
+<input id="expression" placeholder="Example: A+(B*C)**D">
 
 <br>
 
@@ -110,12 +110,12 @@ Postfix : <span id="output">-</span>
 function precedence(op){
 if(op=='+'||op=='-') return 1
 if(op=='*'||op=='/') return 2
-if(op=='**'|| op =='^') return 3
+if(op=='**') return 3
 return 0
 }
 
 function isOperand(ch){
-return /^[A-Za-z0-9]$/.test(ch)
+return /^[A-Za-z0-9]+$/.test(ch)
 }
 
 function convert(){
@@ -137,7 +137,13 @@ table.innerHTML=
 
 for(let i=0;i<exp.length;i++){
 
-let char=exp[i]
+let char = exp[i]
+
+// ตรวจจับ **
+if(char==='*' && exp[i+1]==='*'){
+char='**'
+i++
+}
 
 if(isOperand(char)){
 output+=char
@@ -148,9 +154,9 @@ stack.push(char)
 }
 
 else if(char==')'){
-temp = stack.pop()
-while(stack.length && stack[stack.length-1]!='('){
-output+=stack.pop()
+
+while(stack.length && stack[stack.length-1] != '('){
+output += stack.pop()
 }
 
 stack.pop()
@@ -159,7 +165,7 @@ stack.pop()
 
 else{
 
-while(stack.length && precedence(stack[stack.length-1])>=precedence(char)){
+while(stack.length && precedence(stack[stack.length-1]) >= precedence(char)){
 output+=stack.pop()
 }
 

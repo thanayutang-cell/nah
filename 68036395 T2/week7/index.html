@@ -148,7 +148,7 @@ stack.push(char)
 }
 
 else if(char==')'){
-
+temp = stack.pop()
 while(stack.length && stack[stack.length-1]!='('){
 output+=stack.pop()
 }

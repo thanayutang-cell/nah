@@ -1,0 +1,73 @@
+<script>
+
+let Expression = "A+(B-C^D)*E/F**";
+
+function Precedence(operator){
+
+    if(operator == '+' || operator == '-')
+        return 1;
+
+    else if(operator == '*' || operator == '/')
+        return 2;
+
+    else if(operator == '^' || operator == '**')
+        return 3;
+
+    else
+        return 0;
+}
+
+function infixTopostfix(exp){
+
+    console.log("Expression:",exp);
+
+    let stack = [];
+    let Postfix = [];
+
+    let index = 0;
+
+    while(index < exp.length){
+
+        let char = exp.charAt(index);
+
+        // ตรวจสอบ **
+        if(char == '*' && exp.charAt(index+1) == '*'){
+            char = '**';
+            index++;
+        }
+
+        if(char.match(/[A-Za-z0-9]/)){
+            Postfix.push(char);
+        }
+
+        else if(char == '('){
+            stack.push(char);
+        }
+
+        else if(char == ')'){
+            while(stack.length && stack[stack.length-1] != '('){
+                Postfix.push(stack.pop());
+            }
+            stack.pop();
+        }
+
+        else{
+            while(stack.length && Precedence(stack[stack.length-1]) >= Precedence(char)){
+                Postfix.push(stack.pop());
+            }
+            stack.push(char);
+        }
+
+        index++;
+    }
+
+    while(stack.length){
+        Postfix.push(stack.pop());
+    }
+
+    return Postfix.join(" ");
+}
+
+console.log(infixTopostfix(Expression));
+
+</script>

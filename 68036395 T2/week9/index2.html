@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Infix to Prefix with Table</title>
+
+<style>
+
+body{
+font-family: Arial;
+background: linear-gradient(135deg,#667eea,#764ba2);
+padding:40px;
+color:#333;
+}
+
+.container{
+background:white;
+padding:30px;
+border-radius:10px;
+max-width:700px;
+margin:auto;
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+
+h1{
+text-align:center;
+}
+
+input{
+width:100%;
+padding:10px;
+font-size:16px;
+margin:15px 0;
+}
+
+button{
+padding:10px 20px;
+background:#667eea;
+border:none;
+color:white;
+font-size:16px;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#5563d1;
+}
+
+table{
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+}
+
+th,td{
+border:1px solid #ccc;
+padding:8px;
+text-align:center;
+}
+
+th{
+background:#667eea;
+color:white;
+}
+
+.result{
+margin-top:20px;
+font-size:20px;
+font-weight:bold;
+text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Infix → Prefix Converter</h1>
+
+<input id="infix" placeholder="Enter Infix Expression">
+
+<button onclick="convert()">Convert</button>
+
+<table id="table">
+<thead>
+<tr>
+<th>Step</th>
+<th>Symbol</th>
+<th>Stack</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<div class="result" id="result"></div>
+
+</div>
+
+<script>
+
+function precedence(op){
+if(op=='+'||op=='-') return 1;
+if(op=='*'||op=='/') return 2;
+if(op=='^' || op=='**') return 3;
+return 0;
+}
+
+function reverse(str){
+return str.split('').reverse().join('');
+}
+
+function convert(){
+
+let infix=document.getElementById("infix").value;
+
+let reversed=reverse(infix);
+
+reversed=reversed.replace(/\(/g,'temp')
+                 .replace(/\)/g,'(')
+                 .replace(/temp/g,')');
+
+let stack=[];
+let output="";
+let tableBody=document.querySelector("#table tbody");
+tableBody.innerHTML="";
+
+let step=1;
+
+for(let i=0;i<reversed.length;i++){
+
+let c=reversed[i];
+
+if(/[A-Za-z0-9]/.test(c)){
+output+=c;
+}
+
+else if(c=='('){
+stack.push(c);
+}
+
+else if(c==')'){
+while(stack.length && stack[stack.length-1] != '('){
+output+=stack.pop();
+}
+stack.pop();
+}
+
+else{
+while(stack.length && precedence(stack[stack.length-1])>=precedence(c)){
+output+=stack.pop();
+}
+stack.push(c);
+}
+
+let row=`<tr>
+<td>${step++}</td>
+<td>${c}</td>
+<td>${stack.join(" ")}</td>
+<td>${output}</td>
+</tr>`;
+
+tableBody.innerHTML+=row;
+
+}
+
+while(stack.length){
+output+=stack.pop();
+
+let row=`<tr>
+<td>${step++}</td>
+<td>POP</td>
+<td>${stack.join(" ")}</td>
+<td>${output}</td>
+</tr>`;
+
+tableBody.innerHTML+=row;
+}
+
+let prefix=reverse(output);
+
+document.getElementById("result").innerHTML="Prefix : "+prefix;
+
+}
+
+</script>
+
+</body>
+</html>

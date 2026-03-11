@@ -110,7 +110,7 @@ Postfix : <span id="output">-</span>
 function precedence(op){
 if(op=='+'||op=='-') return 1
 if(op=='*'||op=='/') return 2
-if(op=='**' || op =='^') return 3
+if(op=='**') return 3
 return 0
 }
 
@@ -142,21 +142,20 @@ let char = exp[i]
 // ตรวจจับ **
 if(char==='*' && exp[i+1]==='*'){
 char='**'
-stack.push(char)
 i++
 }
 
-else if(isOperand(char)){
+if(isOperand(char)){
 output+=char
 }
 
-else if(char=='('){
+else if(char==')'){
 stack.push(char)
 }
 
-else if(char==')'){
+else if(char=='('){
 
-while(stack.length && stack[stack.length-1] != '('){
+while(stack.length && stack[stack.length-1] != ')'){
 output += stack.pop()
 }
 

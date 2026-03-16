@@ -1,11 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<title>All Sorting Algorithms - Detailed Solution</title>
+
+<style>
+
+body{
+font-family: Arial;
+background: linear-gradient(135deg,#667eea,#764ba2);
+padding:40px;
+}
+
+.container{
+background:white;
+padding:30px;
+border-radius:12px;
+max-width:1100px;
+margin:auto;
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+
+h1{
+text-align:center;
+}
+
+input,select{
+padding:10px;
+margin:10px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+button{
+padding:10px 20px;
+background:#667eea;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#4f5fd1;
+}
+
+table{
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+
+th{
+background:#667eea;
+color:white;
+}
+
+.compare{
+background:#e6f0ff;
+}
+
+.swap{
+background:#ffd6d6;
+}
+
+</style>
 </head>
+
 <body>
-    
+
+<div class="container">
+
+<h1>Sorting Algorithms Visualizer (Detailed Solution)</h1>
+
+<input type="text" id="numbers" placeholder="Example: 5,3,8,4,2">
+
+<select id="algorithm">
+<option value="bubble">Bubble Sort</option>
+<option value="selection">Selection Sort</option>
+<option value="insertion">Insertion Sort</option>
+<option value="quick">Quick Sort</option>
+<option value="merge">Merge Sort</option>
+</select>
+
+<button onclick="startSort()">Sort</button>
+
+<table>
+
+<thead>
+<tr>
+<th>Step</th>
+<th>Algorithm</th>
+<th>Compare / Operation</th>
+<th>Action</th>
+<th>Array State</th>
+</tr>
+</thead>
+
+<tbody id="result"></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+let step=1
+let table
+
+function record(algo,compare,action,arr,className){
+
+table.innerHTML+=`
+<tr class="${className}">
+<td>${step++}</td>
+<td>${algo}</td>
+<td>${compare}</td>
+<td>${action}</td>
+<td>${arr.join(", ")}</td>
+</tr>
+`
+
+}
+
+function bubbleSort(arr){
+
+for(let i=0;i<arr.length-1;i++){
+for(let j=0;j<arr.length-i-1;j++){
+
+record("Bubble",arr[j]+" > "+arr[j+1],"Compare",arr,"compare")
+
+if(arr[j] > arr[j+1]){
+
+[arr[j],arr[j+1]]=[arr[j+1],arr[j]]
+
+record("Bubble","Swap "+arr[j]+" and "+arr[j+1],"Swap",arr,"swap")
+
+}
+
+}
+}
+
+}
+
+function selectionSort(arr){
+
+for(let i=0;i<arr.length;i++){
+
+let min=i
+
+for(let j=i+1;j<arr.length;j++){
+
+record("Selection",arr[min]+" > "+arr[j],"Compare",arr,"compare")
+
+if(arr[j] < arr[min]){
+min=j
+}
+
+}
+
+if(min!=i){
+
+[arr[i],arr[min]]=[arr[min],arr[i]]
+
+record("Selection","Swap "+arr[i]+" and "+arr[min],"Swap",arr,"swap")
+
+}
+
+}
+
+}
+
+function insertionSort(arr){
+
+for(let i=1;i<arr.length;i++){
+
+let key=arr[i]
+let j=i-1
+
+while(j>=0 && arr[j] > key){
+
+record("Insertion",arr[j]+" > "+key,"Shift",arr,"compare")
+
+arr[j+1]=arr[j]
+
+j--
+
+}
+
+arr[j+1]=key
+
+record("Insertion","Insert "+key,"Insert",arr,"swap")
+
+}
+
+}
+
+function quickSort(arr,left=0,right=arr.length-1){
+
+if(left<right){
+
+let pivot=partition(arr,left,right)
+
+quickSort(arr,left,pivot-1)
+quickSort(arr,pivot+1,right)
+
+}
+
+}
+
+function partition(arr,left,right){
+
+let pivot=arr[right]
+let i=left-1
+
+for(let j=left;j<right;j++){
+
+record("Quick","Compare "+arr[j]+" with pivot "+pivot,"Compare",arr,"compare")
+
+if(arr[j] < pivot){
+
+i++
+
+[arr[i],arr[j]]=[arr[j],arr[i]]
+
+record("Quick","Swap", "Swap",arr,"swap")
+
+}
+
+}
+
+[arr[i+1],arr[right]]=[arr[right],arr[i+1]]
+
+record("Quick","Place Pivot "+pivot,"Pivot Swap",arr,"swap")
+
+return i+1
+
+}
+
+function mergeSort(arr){
+
+if(arr.length<=1) return arr
+
+let mid=Math.floor(arr.length/2)
+
+let left=mergeSort(arr.slice(0,mid))
+let right=mergeSort(arr.slice(mid))
+
+return merge(left,right)
+
+}
+
+function merge(left,right){
+
+let result=[]
+
+while(left.length && right.length){
+
+if(left[0] < right[0]){
+
+result.push(left.shift())
+
+}else{
+
+result.push(right.shift())
+
+}
+
+record("Merge","Merging","Insert",result.concat(left).concat(right),"compare")
+
+}
+
+return result.concat(left).concat(right)
+
+}
+
+function startSort(){
+
+step=1
+
+table=document.getElementById("result")
+table.innerHTML=""
+
+let input=document.getElementById("numbers").value
+
+let arr=input.split(",").map(Number)
+
+let algo=document.getElementById("algorithm").value
+
+let arrCopy=[...arr]
+
+if(algo=="bubble") bubbleSort(arrCopy)
+if(algo=="selection") selectionSort(arrCopy)
+if(algo=="insertion") insertionSort(arrCopy)
+if(algo=="quick") quickSort(arrCopy)
+if(algo=="merge") arrCopy=mergeSort(arrCopy)
+
+table.innerHTML+=`
+<tr>
+<td colspan="5"><b>Sorted Result : ${arrCopy.join(", ")}</b></td>
+</tr>
+`
+
+}
+
+</script>
+
 </body>
 </html>

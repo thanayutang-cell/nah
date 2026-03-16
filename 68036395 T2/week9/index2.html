@@ -105,7 +105,7 @@ text-align:center;
 function precedence(op){
 if(op=='+'||op=='-') return 1;
 if(op=='*'||op=='/') return 2;
-if(op=='^' || op=='**') return 3;
+if(op=='**' || op=='^') return 3;
 return 0;
 }
 
@@ -125,6 +125,7 @@ reversed=reversed.replace(/\(/g,'temp')
 
 let stack=[];
 let output="";
+
 let tableBody=document.querySelector("#table tbody");
 tableBody.innerHTML="";
 
@@ -133,6 +134,11 @@ let step=1;
 for(let i=0;i<reversed.length;i++){
 
 let c=reversed[i];
+
+if(c=="*" && reversed[i+1]=="*"){
+c="**";
+i++;
+}
 
 if(/[A-Za-z0-9]/.test(c)){
 output+=c;
@@ -150,16 +156,19 @@ stack.pop();
 }
 
 else{
-while(stack.length && precedence(stack[stack.length-1])>=precedence(c)){
+
+while(stack.length && precedence(stack[stack.length-1]) > precedence(c)){
 output+=stack.pop();
 }
+
 stack.push(c);
+
 }
 
 let row=`<tr>
 <td>${step++}</td>
 <td>${c}</td>
-<td>${stack.join(" ")}</td>
+<td>${stack.join("")}</td>
 <td>${output}</td>
 </tr>`;
 
@@ -168,16 +177,18 @@ tableBody.innerHTML+=row;
 }
 
 while(stack.length){
+
 output+=stack.pop();
 
 let row=`<tr>
 <td>${step++}</td>
 <td>POP</td>
-<td>${stack.join(" ")}</td>
+<td>${stack.join("")}</td>
 <td>${output}</td>
 </tr>`;
 
 tableBody.innerHTML+=row;
+
 }
 
 let prefix=reverse(output);

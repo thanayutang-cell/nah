@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>All Sorting Algorithms - Detailed Solution</title>
+<title>All Sorting Algorithms Visualizer</title>
 
 <style>
 
@@ -18,7 +18,7 @@ padding:30px;
 border-radius:12px;
 max-width:1100px;
 margin:auto;
-box-shadow:0 10px 20px rgba(0,0,0,0.2);
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
 h1{
@@ -79,7 +79,7 @@ background:#ffd6d6;
 
 <h1>Sorting Algorithms Visualizer (Detailed Solution)</h1>
 
-<input type="text" id="numbers" placeholder="Example: 5,3,8,4,2">
+<input type="text" id="numbers" placeholder="Example: 9,8,3,7,5,6,4,1">
 
 <select id="algorithm">
 <option value="bubble">Bubble Sort</option>
@@ -87,6 +87,7 @@ background:#ffd6d6;
 <option value="insertion">Insertion Sort</option>
 <option value="quick">Quick Sort</option>
 <option value="merge">Merge Sort</option>
+<option value="shell">Shell Sort</option>
 </select>
 
 <button onclick="startSort()">Sort</button>
@@ -97,7 +98,7 @@ background:#ffd6d6;
 <tr>
 <th>Step</th>
 <th>Algorithm</th>
-<th>Compare / Operation</th>
+<th>Operation</th>
 <th>Action</th>
 <th>Array State</th>
 </tr>
@@ -114,13 +115,13 @@ background:#ffd6d6;
 let step=1
 let table
 
-function record(algo,compare,action,arr,className){
+function record(algo,operation,action,arr,className){
 
 table.innerHTML+=`
 <tr class="${className}">
 <td>${step++}</td>
 <td>${algo}</td>
-<td>${compare}</td>
+<td>${operation}</td>
 <td>${action}</td>
 <td>${arr.join(", ")}</td>
 </tr>
@@ -229,7 +230,7 @@ i++
 
 [arr[i],arr[j]]=[arr[j],arr[i]]
 
-record("Quick","Swap", "Swap",arr,"swap")
+record("Quick","Swap","Swap",arr,"swap")
 
 }
 
@@ -280,6 +281,39 @@ return result.concat(left).concat(right)
 
 }
 
+function shellSort(arr){
+
+let n=arr.length
+
+for(let gap=Math.floor(n/2); gap>0; gap=Math.floor(gap/2)){
+
+record("Shell","Gap = "+gap,"New Gap",arr,"compare")
+
+for(let i=gap;i<n;i++){
+
+let temp=arr[i]
+let j=i
+
+while(j>=gap && arr[j-gap] > temp){
+
+record("Shell",arr[j-gap]+" > "+temp,"Shift",arr,"compare")
+
+arr[j]=arr[j-gap]
+
+j-=gap
+
+}
+
+arr[j]=temp
+
+record("Shell","Insert "+temp,"Insert",arr,"swap")
+
+}
+
+}
+
+}
+
 function startSort(){
 
 step=1
@@ -300,6 +334,7 @@ if(algo=="selection") selectionSort(arrCopy)
 if(algo=="insertion") insertionSort(arrCopy)
 if(algo=="quick") quickSort(arrCopy)
 if(algo=="merge") arrCopy=mergeSort(arrCopy)
+if(algo=="shell") shellSort(arrCopy)
 
 table.innerHTML+=`
 <tr>

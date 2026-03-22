@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sorting Step-by-Step</title>
+<title>Sorting Step-by-Step (All)</title>
 
 <style>
 body{
@@ -50,7 +50,7 @@ select,input,button{
 
 <div class="container">
 
-<h2>🧠 Sorting Step-by-Step</h2>
+<h2>🧠 Sorting Step-by-Step (All Algorithms)</h2>
 
 <input id="input" placeholder="เช่น 5,3,8,1,2">
 
@@ -62,6 +62,7 @@ select,input,button{
 <option value="insertion">Insertion Sort</option>
 <option value="merge">Merge Sort</option>
 <option value="quick">Quick Sort</option>
+<option value="shell">Shell Sort</option>
 </select>
 
 <br>
@@ -257,6 +258,45 @@ function quickSteps(arr){
     helper(arr);
 }
 
+// Shell
+function shellSteps(arr){
+    let a=[...arr];
+    let n=a.length;
+
+    for(let gap=Math.floor(n/2); gap>0; gap=Math.floor(gap/2)){
+
+        addStep(a,`Gap = ${gap}`);
+
+        for(let i=gap;i<n;i++){
+            let temp=a[i];
+            let j=i;
+
+            addStep(a,`พิจารณา ${temp}`);
+
+            while(j>=gap && a[j-gap]>temp){
+
+                addStep(a,`เปรียบเทียบ ${a[j-gap]} กับ ${temp}`,{
+                    compare:[j-gap,j]
+                });
+
+                a[j]=a[j-gap];
+
+                addStep(a,`เลื่อนค่าไปขวา`,{
+                    swap:[j]
+                });
+
+                j-=gap;
+            }
+
+            a[j]=temp;
+
+            addStep(a,`ใส่ตำแหน่งถูกต้อง`,{
+                swap:[j]
+            });
+        }
+    }
+}
+
 // ===== Main =====
 function start(){
 
@@ -273,6 +313,7 @@ function start(){
     if(algo==="insertion") insertionSteps(arr);
     if(algo==="merge") mergeSteps(arr);
     if(algo==="quick") quickSteps(arr);
+    if(algo==="shell") shellSteps(arr);
 
     nextStep();
 }

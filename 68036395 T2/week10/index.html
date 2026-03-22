@@ -2,74 +2,47 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>All Sorting Algorithms Visualizer</title>
+<title>Sorting Step-by-Step</title>
 
 <style>
-
 body{
-font-family: Arial;
-background: linear-gradient(135deg,#667eea,#764ba2);
-padding:40px;
+    font-family: Arial;
+    background:#1e1e2f;
+    color:white;
+    text-align:center;
 }
 
-.container{
-background:white;
-padding:30px;
-border-radius:12px;
-max-width:1100px;
-margin:auto;
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
+.container{ max-width:900px; margin:auto; }
+
+select,input,button{
+    padding:8px;
+    margin:5px;
 }
 
-h1{
-text-align:center;
+.bars{
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    height:250px;
 }
 
-input,select{
-padding:10px;
-margin:10px;
-border-radius:6px;
-border:1px solid #ccc;
+.bar{
+    width:20px;
+    margin:2px;
+    background:cyan;
 }
 
-button{
-padding:10px 20px;
-background:#667eea;
-color:white;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
+.compare{ background:red !important; }
+.swap{ background:lime !important; }
+.pivot{ background:orange !important; }
 
-button:hover{
-background:#4f5fd1;
+.info{
+    margin-top:10px;
+    background:#333;
+    padding:10px;
+    border-radius:8px;
+    text-align:left;
 }
-
-table{
-width:100%;
-margin-top:20px;
-border-collapse:collapse;
-}
-
-th,td{
-border:1px solid #ddd;
-padding:8px;
-text-align:center;
-}
-
-th{
-background:#667eea;
-color:white;
-}
-
-.compare{
-background:#e6f0ff;
-}
-
-.swap{
-background:#ffd6d6;
-}
-
 </style>
 </head>
 
@@ -77,271 +50,231 @@ background:#ffd6d6;
 
 <div class="container">
 
-<h1>Sorting Algorithms Visualizer (Detailed Solution)</h1>
+<h2>🧠 Sorting Step-by-Step</h2>
 
-<input type="text" id="numbers" placeholder="Example: 9,8,3,7,5,6,4,1">
+<input id="input" placeholder="เช่น 5,3,8,1,2">
 
-<select id="algorithm">
+<br>
+
+<select id="algo">
 <option value="bubble">Bubble Sort</option>
 <option value="selection">Selection Sort</option>
 <option value="insertion">Insertion Sort</option>
-<option value="quick">Quick Sort</option>
 <option value="merge">Merge Sort</option>
-<option value="shell">Shell Sort</option>
+<option value="quick">Quick Sort</option>
 </select>
 
-<button onclick="startSort()">Sort</button>
+<br>
 
-<table>
+<button onclick="start()">Start</button>
+<button onclick="nextStep()">➡ Next</button>
 
-<thead>
-<tr>
-<th>Step</th>
-<th>Algorithm</th>
-<th>Operation</th>
-<th>Action</th>
-<th>Array State</th>
-</tr>
-</thead>
+<div class="bars" id="bars"></div>
 
-<tbody id="result"></tbody>
-
-</table>
+<div class="info" id="info"></div>
 
 </div>
 
 <script>
 
-let step=1
-let table
+// ===== GLOBAL =====
+let steps=[];
+let stepIndex=0;
 
-function record(algo,operation,action,arr,className){
-
-table.innerHTML+=`
-<tr class="${className}">
-<td>${step++}</td>
-<td>${algo}</td>
-<td>${operation}</td>
-<td>${action}</td>
-<td>${arr.join(", ")}</td>
-</tr>
-`
-
+// ===== Utils =====
+function getArray(){
+    return document.getElementById("input").value
+    .split(",").map(x=>Number(x));
 }
 
-function bubbleSort(arr){
+function drawBars(arr, highlight={}){
+    let bars=document.getElementById("bars");
+    bars.innerHTML="";
 
-for(let i=0;i<arr.length-1;i++){
-for(let j=0;j<arr.length-i-1;j++){
+    arr.forEach((v,i)=>{
+        let d=document.createElement("div");
+        d.className="bar";
+        d.style.height=v*20+"px";
 
-record("Bubble",arr[j]+" > "+arr[j+1],"Compare",arr,"compare")
+        if(highlight.compare?.includes(i)) d.classList.add("compare");
+        if(highlight.swap?.includes(i)) d.classList.add("swap");
+        if(highlight.pivot===i) d.classList.add("pivot");
 
-if(arr[j] > arr[j+1]){
-
-[arr[j],arr[j+1]]=[arr[j+1],arr[j]]
-
-record("Bubble","Swap "+arr[j]+" and "+arr[j+1],"Swap",arr,"swap")
-
+        bars.appendChild(d);
+    });
 }
 
-}
-}
-
-}
-
-function selectionSort(arr){
-
-for(let i=0;i<arr.length;i++){
-
-let min=i
-
-for(let j=i+1;j<arr.length;j++){
-
-record("Selection",arr[min]+" > "+arr[j],"Compare",arr,"compare")
-
-if(arr[j] < arr[min]){
-min=j
+// ===== Step Engine =====
+function addStep(arr, text, highlight={}){
+    steps.push({
+        arr:[...arr],
+        text,
+        highlight
+    });
 }
 
+function nextStep(){
+    if(stepIndex >= steps.length) return;
+
+    let s = steps[stepIndex];
+    drawBars(s.arr, s.highlight);
+    document.getElementById("info").innerText = s.text;
+
+    stepIndex++;
 }
 
-if(min!=i){
+// ================= SORTING =================
 
-[arr[i],arr[min]]=[arr[min],arr[i]]
+// Bubble
+function bubbleSteps(arr){
+    let a=[...arr];
 
-record("Selection","Swap "+arr[i]+" and "+arr[min],"Swap",arr,"swap")
+    for(let i=0;i<a.length;i++){
+        for(let j=0;j<a.length-i-1;j++){
 
+            addStep(a,`เปรียบเทียบ ${a[j]} กับ ${a[j+1]}`,{
+                compare:[j,j+1]
+            });
+
+            if(a[j]>a[j+1]){
+                [a[j],a[j+1]]=[a[j+1],a[j]];
+
+                addStep(a,`สลับตำแหน่ง`,{
+                    swap:[j,j+1]
+                });
+            }
+        }
+    }
 }
 
+// Selection
+function selectionSteps(arr){
+    let a=[...arr];
+
+    for(let i=0;i<a.length;i++){
+        let min=i;
+
+        for(let j=i+1;j<a.length;j++){
+            if(a[j]<a[min]) min=j;
+        }
+
+        addStep(a,`เลือก min = ${a[min]}`,{compare:[min]});
+
+        [a[i],a[min]]=[a[min],a[i]];
+
+        addStep(a,`สลับกับตำแหน่ง ${i}`,{swap:[i,min]});
+    }
 }
 
+// Insertion
+function insertionSteps(arr){
+    let a=[...arr];
+
+    for(let i=1;i<a.length;i++){
+        let key=a[i];
+        let j=i-1;
+
+        addStep(a,`Insert ${key}`);
+
+        while(j>=0 && a[j]>key){
+            a[j+1]=a[j];
+            j--;
+
+            addStep(a,"เลื่อนค่าไปขวา",{swap:[j+1]});
+        }
+
+        a[j+1]=key;
+
+        addStep(a,"ใส่ตำแหน่งถูกต้อง",{swap:[j+1]});
+    }
 }
 
-function insertionSort(arr){
+// Merge
+function mergeSteps(arr){
 
-for(let i=1;i<arr.length;i++){
+    function helper(a){
 
-let key=arr[i]
-let j=i-1
+        if(a.length<=1) return a;
 
-while(j>=0 && arr[j] > key){
+        let mid=Math.floor(a.length/2);
+        let left=a.slice(0,mid);
+        let right=a.slice(mid);
 
-record("Insertion",arr[j]+" > "+key,"Shift",arr,"compare")
+        addStep(a,`แบ่ง → ${left} | ${right}`);
 
-arr[j+1]=arr[j]
+        let l=helper(left);
+        let r=helper(right);
 
-j--
+        let res=[];
+        while(l.length && r.length){
+            if(l[0]<r[0]) res.push(l.shift());
+            else res.push(r.shift());
+        }
 
+        let merged=[...res,...l,...r];
+
+        addStep(merged,"รวมกลับ");
+
+        return merged;
+    }
+
+    helper(arr);
 }
 
-arr[j+1]=key
+// Quick
+function quickSteps(arr){
 
-record("Insertion","Insert "+key,"Insert",arr,"swap")
+    function helper(a){
 
+        if(a.length<=1) return a;
+
+        let pivot=a[a.length-1];
+        let left=[],right=[];
+
+        addStep(a,`Pivot = ${pivot}`,{pivot:a.length-1});
+
+        for(let i=0;i<a.length-1;i++){
+            if(a[i]<pivot) left.push(a[i]);
+            else right.push(a[i]);
+        }
+
+        addStep(
+            [...left,pivot,...right],
+            `Split → L:${left} R:${right}`,
+            {pivot:left.length}
+        );
+
+        let l=helper(left);
+        let r=helper(right);
+
+        let res=[...l,pivot,...r];
+
+        addStep(res,"รวมกลับ");
+
+        return res;
+    }
+
+    helper(arr);
 }
 
-}
+// ===== Main =====
+function start(){
 
-function quickSort(arr,left=0,right=arr.length-1){
+    steps=[];
+    stepIndex=0;
 
-if(left<right){
+    let arr=getArray();
+    let algo=document.getElementById("algo").value;
 
-let pivot=partition(arr,left,right)
+    drawBars(arr);
 
-quickSort(arr,left,pivot-1)
-quickSort(arr,pivot+1,right)
+    if(algo==="bubble") bubbleSteps(arr);
+    if(algo==="selection") selectionSteps(arr);
+    if(algo==="insertion") insertionSteps(arr);
+    if(algo==="merge") mergeSteps(arr);
+    if(algo==="quick") quickSteps(arr);
 
-}
-
-}
-
-function partition(arr,left,right){
-
-let pivot=arr[right]
-let i=left-1
-
-for(let j=left;j<right;j++){
-
-record("Quick","Compare "+arr[j]+" with pivot "+pivot,"Compare",arr,"compare")
-
-if(arr[j] < pivot){
-
-i++
-
-[arr[i],arr[j]]=[arr[j],arr[i]]
-
-record("Quick","Swap","Swap",arr,"swap")
-
-}
-
-}
-
-[arr[i+1],arr[right]]=[arr[right],arr[i+1]]
-
-record("Quick","Place Pivot "+pivot,"Pivot Swap",arr,"swap")
-
-return i+1
-
-}
-
-function mergeSort(arr){
-
-if(arr.length<=1) return arr
-
-let mid=Math.floor(arr.length/2)
-
-let left=mergeSort(arr.slice(0,mid))
-let right=mergeSort(arr.slice(mid))
-
-return merge(left,right)
-
-}
-
-function merge(left,right){
-
-let result=[]
-
-while(left.length && right.length){
-
-if(left[0] < right[0]){
-
-result.push(left.shift())
-
-}else{
-
-result.push(right.shift())
-
-}
-
-record("Merge","Merging","Insert",result.concat(left).concat(right),"compare")
-
-}
-
-return result.concat(left).concat(right)
-
-}
-
-function shellSort(arr){
-
-let n=arr.length
-
-for(let gap=Math.floor(n/2); gap>0; gap=Math.floor(gap/2)){
-
-record("Shell","Gap = "+gap,"New Gap",arr,"compare")
-
-for(let i=gap;i<n;i++){
-
-let temp=arr[i]
-let j=i
-
-while(j>=gap && arr[j-gap] > temp){
-
-record("Shell",arr[j-gap]+" > "+temp,"Shift",arr,"compare")
-
-arr[j]=arr[j-gap]
-
-j-=gap
-
-}
-
-arr[j]=temp
-
-record("Shell","Insert "+temp,"Insert",arr,"swap")
-
-}
-
-}
-
-}
-
-function startSort(){
-
-step=1
-
-table=document.getElementById("result")
-table.innerHTML=""
-
-let input=document.getElementById("numbers").value
-
-let arr=input.split(",").map(Number)
-
-let algo=document.getElementById("algorithm").value
-
-let arrCopy=[...arr]
-
-if(algo=="bubble") bubbleSort(arrCopy)
-if(algo=="selection") selectionSort(arrCopy)
-if(algo=="insertion") insertionSort(arrCopy)
-if(algo=="quick") quickSort(arrCopy)
-if(algo=="merge") arrCopy=mergeSort(arrCopy)
-if(algo=="shell") shellSort(arrCopy)
-
-table.innerHTML+=`
-<tr>
-<td colspan="5"><b>Sorted Result : ${arrCopy.join(", ")}</b></td>
-</tr>
-`
-
+    nextStep();
 }
 
 </script>

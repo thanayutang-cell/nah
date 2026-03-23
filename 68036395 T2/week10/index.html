@@ -2,320 +2,342 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sorting Step-by-Step (All)</title>
+<title>Sorting Full Fixed</title>
 
 <style>
-body{
-    font-family: Arial;
-    background:#1e1e2f;
-    color:white;
-    text-align:center;
-}
+body{font-family:Arial;background:#1e1e2f;color:white;text-align:center;}
+.container{max-width:1200px;margin:auto;}
+button,select,input{padding:8px;margin:5px;}
 
-.container{ max-width:900px; margin:auto; }
+.bars{display:flex;align-items:flex-end;height:300px;overflow-x:auto;}
+.bar{margin:2px;background:cyan;text-align:center;font-size:10px;}
 
-select,input,button{
-    padding:8px;
-    margin:5px;
-}
+.compare{background:red!important;}
+.swap{background:lime!important;}
+.pivot{background:orange!important;}
 
-.bars{
-    display:flex;
-    justify-content:center;
-    align-items:flex-end;
-    height:250px;
-}
-
-.bar{
-    width:20px;
-    margin:2px;
-    background:cyan;
-}
-
-.compare{ background:red !important; }
-.swap{ background:lime !important; }
-.pivot{ background:orange !important; }
-
-.info{
-    margin-top:10px;
-    background:#333;
-    padding:10px;
-    border-radius:8px;
-    text-align:left;
-}
+table{width:100%;margin-top:20px;border-collapse:collapse;background:#222;}
+th,td{border:1px solid #555;padding:6px;font-size:12px;}
+th{background:#444;}
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-<h2> Sorting Step-by-Step (All Algorithms)</h2>
+<h2>🎓 Sorting System (Fixed + 100+ Support)</h2>
 
-<input id="input" placeholder="เช่น 5,3,8,1,2">
-
-<br>
+<input id="size" type="number" value="20" min="2" max="300">
+<button onclick="randomStudents()">🎲 Random</button>
 
 <select id="algo">
-<option value="bubble">Bubble Sort</option>
-<option value="selection">Selection Sort</option>
-<option value="insertion">Insertion Sort</option>
-<option value="merge">Merge Sort</option>
-<option value="quick">Quick Sort</option>
-<option value="shell">Shell Sort</option>
+<option value="bubble">Bubble</option>
+<option value="selection">Selection</option>
+<option value="insertion">Insertion</option>
+<option value="merge">Merge</option>
+<option value="quick">Quick</option>
+<option value="shell">Shell</option>
 </select>
 
-<br>
-
-<button onclick="start()">Start</button>
+<button onclick="startSort()">Start</button>
 <button onclick="nextStep()">➡ Next</button>
+<button onclick="play()">▶ Play</button>
+<button onclick="pause()">⏸ Pause</button>
+
+<input id="speed" type="range" min="50" max="1500" value="300">
 
 <div class="bars" id="bars"></div>
+<div id="info"></div>
 
-<div class="info" id="info"></div>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Array</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
 
 </div>
 
 <script>
 
-// ===== GLOBAL =====
-let steps=[];
-let stepIndex=0;
+let steps=[], stepIndex=0, timer=null;
+let currentArr=[];
 
-// ===== Utils =====
-function getArray(){
-    return document.getElementById("input").value
-    .split(",").map(x=>Number(x));
+// ===== RULE =====
+function shouldSwap(a,b){
+    if(a.score > b.score) return true;
+    if(a.score===b.score && a.name > b.name) return true;
+    return false;
 }
 
-function drawBars(arr, highlight={}){
+// ===== EXPLAIN =====
+function explain(a,b){
+    if(!a || !b) return "ข้อมูลผิดพลาด";
+
+    if(a.score < b.score)
+        return `${a.name}(${a.score}) < ${b.name}(${b.score}) → ไม่สลับ`;
+
+    if(a.score > b.score)
+        return `${a.name}(${a.score}) > ${b.name}(${b.score}) → ต้องสลับ`;
+
+    if(a.name < b.name)
+        return `คะแนนเท่ากัน (${a.score}) และ ${a.name} < ${b.name} → ไม่สลับ`;
+
+    return `คะแนนเท่ากัน (${a.score}) แต่ ${a.name} > ${b.name} → ต้องสลับ`;
+}
+
+// ===== DRAW =====
+function draw(arr,highlight={}){
     let bars=document.getElementById("bars");
     bars.innerHTML="";
 
-    arr.forEach((v,i)=>{
+    let width=Math.max(10,800/arr.length);
+
+    arr.forEach((s,i)=>{
+        if(!s || s.score===undefined) return; // 🔥 FIX undefined
+
         let d=document.createElement("div");
         d.className="bar";
-        d.style.height=v*20+"px";
+        d.style.height=s.score*2+"px";
+        d.style.width=width+"px";
+        d.innerHTML=`${s.name}<br>${s.score}`;
 
         if(highlight.compare?.includes(i)) d.classList.add("compare");
         if(highlight.swap?.includes(i)) d.classList.add("swap");
-        if(highlight.pivot===i) d.classList.add("pivot");
+        if(highlight.pivot?.includes(i)) d.classList.add("pivot");
 
         bars.appendChild(d);
     });
 }
 
-// ===== Step Engine =====
-function addStep(arr, text, highlight={}){
+// ===== STEP =====
+function addStep(arr,text,highlight={}){
     steps.push({
-        arr:[...arr],
+        arr: JSON.parse(JSON.stringify(arr)), // 🔥 deep copy FIX
         text,
         highlight
     });
 }
 
+// ===== TABLE =====
+function addRow(i,s){
+    let tr=document.createElement("tr");
+    let arrText=s.arr.map(x=>`${x.name}(${x.score})`).join(", ");
+
+    tr.innerHTML=`<td>${i+1}</td><td>${arrText}</td><td>${s.text}</td>`;
+    document.getElementById("tbody").appendChild(tr);
+}
+
+// ===== NEXT =====
 function nextStep(){
-    if(stepIndex >= steps.length) return;
+    if(stepIndex>=steps.length) return;
 
-    let s = steps[stepIndex];
-    drawBars(s.arr, s.highlight);
-    document.getElementById("info").innerText = s.text;
+    let s=steps[stepIndex];
 
+    draw(s.arr,s.highlight);
+    document.getElementById("info").innerText=s.text;
+
+    addRow(stepIndex,s);
     stepIndex++;
 }
 
-// ================= SORTING =================
+// ===== AUTO =====
+function play(){
+    if(timer) return;
 
-// Bubble
-function bubbleSteps(arr){
-    let a=[...arr];
+    let speed=document.getElementById("speed").value;
+
+    timer=setInterval(()=>{
+        if(stepIndex>=steps.length){pause();return;}
+        nextStep();
+    },speed);
+}
+
+function pause(){
+    clearInterval(timer);
+    timer=null;
+}
+
+// ===== RANDOM (FIX 100+) =====
+function randomStudents(){
+    let n=parseInt(document.getElementById("size").value);
+    let names="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    currentArr=[];
+
+    for(let i=0;i<n;i++){
+        currentArr.push({
+            name: names[i % 26] + Math.floor(i / 26), // 🔥 FIX
+            score: Math.floor(Math.random()*100)
+        });
+    }
+
+    draw(currentArr);
+}
+
+// ===== START =====
+function startSort(){
+    pause();
+    steps=[]; stepIndex=0;
+    document.getElementById("tbody").innerHTML="";
+
+    let algo=document.getElementById("algo").value;
+
+    if(algo==="bubble") bubble(currentArr);
+    if(algo==="selection") selection(currentArr);
+    if(algo==="insertion") insertion(currentArr);
+    if(algo==="merge") mergeSort(currentArr);
+    if(algo==="quick") quickSort(currentArr);
+    if(algo==="shell") shell(currentArr);
+
+    nextStep();
+}
+
+// ===== BUBBLE =====
+function bubble(arr){
+    let a=JSON.parse(JSON.stringify(arr));
 
     for(let i=0;i<a.length;i++){
         for(let j=0;j<a.length-i-1;j++){
 
-            addStep(a,`เปรียบเทียบ ${a[j]} กับ ${a[j+1]}`,{
-                compare:[j,j+1]
-            });
+            addStep(a,
+            `Bubble: เปรียบเทียบ ${a[j].name} กับ ${a[j+1].name}
+→ ${explain(a[j],a[j+1])}`,
+            {compare:[j,j+1]});
 
-            if(a[j]>a[j+1]){
+            if(shouldSwap(a[j],a[j+1])){
                 [a[j],a[j+1]]=[a[j+1],a[j]];
 
-                addStep(a,`สลับตำแหน่ง`,{
-                    swap:[j,j+1]
-                });
+                addStep(a,
+                `สลับตำแหน่ง`,
+                {swap:[j,j+1]});
             }
         }
     }
 }
 
-// Selection
-function selectionSteps(arr){
-    let a=[...arr];
+// ===== SELECTION =====
+function selection(arr){
+    let a=JSON.parse(JSON.stringify(arr));
 
     for(let i=0;i<a.length;i++){
         let min=i;
 
         for(let j=i+1;j<a.length;j++){
-            if(a[j]<a[min]) min=j;
+            addStep(a,
+            `Selection: เปรียบเทียบ ${a[min].name} กับ ${a[j].name}
+→ ${explain(a[min],a[j])}`,
+            {compare:[min,j]});
+
+            if(shouldSwap(a[min],a[j])) min=j;
         }
 
-        addStep(a,`เลือก min = ${a[min]}`,{compare:[min]});
-
         [a[i],a[min]]=[a[min],a[i]];
-
-        addStep(a,`สลับกับตำแหน่ง ${i}`,{swap:[i,min]});
+        addStep(a,`นำค่าที่น้อยสุดมาไว้ตำแหน่ง ${i}`,{swap:[i,min]});
     }
 }
 
-// Insertion
-function insertionSteps(arr){
-    let a=[...arr];
+// ===== INSERTION =====
+function insertion(arr){
+    let a=JSON.parse(JSON.stringify(arr));
 
     for(let i=1;i<a.length;i++){
         let key=a[i];
         let j=i-1;
 
-        addStep(a,`Insert ${key}`);
+        while(j>=0 && shouldSwap(a[j],key)){
+            addStep(a,
+            `Insertion: ${a[j].name} > ${key.name} → เลื่อน`,
+            {compare:[j]});
 
-        while(j>=0 && a[j]>key){
             a[j+1]=a[j];
             j--;
-
-            addStep(a,"เลื่อนค่าไปขวา",{swap:[j+1]});
         }
 
         a[j+1]=key;
-
-        addStep(a,"ใส่ตำแหน่งถูกต้อง",{swap:[j+1]});
+        addStep(a,`แทรก ${key.name}`,{swap:[j+1]});
     }
 }
 
-// Merge
-function mergeSteps(arr){
+// ===== MERGE =====
+function mergeSort(arr){
 
-    function helper(a){
-
+    function merge(a){
         if(a.length<=1) return a;
 
         let mid=Math.floor(a.length/2);
-        let left=a.slice(0,mid);
-        let right=a.slice(mid);
-
-        addStep(a,`แบ่ง → ${left} | ${right}`);
-
-        let l=helper(left);
-        let r=helper(right);
+        let left=merge(a.slice(0,mid));
+        let right=merge(a.slice(mid));
 
         let res=[];
-        while(l.length && r.length){
-            if(l[0]<r[0]) res.push(l.shift());
-            else res.push(r.shift());
+
+        while(left.length && right.length){
+            if(shouldSwap(right[0],left[0])){
+                res.push(left.shift());
+            }else{
+                res.push(right.shift());
+            }
         }
 
-        let merged=[...res,...l,...r];
-
-        addStep(merged,"รวมกลับ");
-
+        let merged=[...res,...left,...right];
+        addStep(merged,"Merge: รวมข้อมูลเรียงแล้ว");
         return merged;
     }
 
-    helper(arr);
+    merge(JSON.parse(JSON.stringify(arr)));
 }
 
-// Quick
-function quickSteps(arr){
+// ===== QUICK =====
+function quickSort(arr){
 
-    function helper(a){
-
+    function qs(a){
         if(a.length<=1) return a;
 
         let pivot=a[a.length-1];
-        let left=[],right=[];
+        let left=[], right=[];
 
-        addStep(a,`Pivot = ${pivot}`,{pivot:a.length-1});
+        addStep(a,`Pivot = ${pivot.name}`,{pivot:[a.length-1]});
 
         for(let i=0;i<a.length-1;i++){
-            if(a[i]<pivot) left.push(a[i]);
+            if(shouldSwap(pivot,a[i])) left.push(a[i]);
             else right.push(a[i]);
         }
 
-        addStep(
-            [...left,pivot,...right],
-            `Split → L:${left} R:${right}`,
-            {pivot:left.length}
-        );
-
-        let l=helper(left);
-        let r=helper(right);
-
-        let res=[...l,pivot,...r];
-
-        addStep(res,"รวมกลับ");
-
+        let res=[...qs(left),pivot,...qs(right)];
+        addStep(res,"Quick: รวม");
         return res;
     }
 
-    helper(arr);
+    qs(JSON.parse(JSON.stringify(arr)));
 }
 
-// Shell
-function shellSteps(arr){
-    let a=[...arr];
+// ===== SHELL =====
+function shell(arr){
+    let a=JSON.parse(JSON.stringify(arr));
     let n=a.length;
 
-    for(let gap=Math.floor(n/2); gap>0; gap=Math.floor(gap/2)){
-
-        addStep(a,`Gap = ${gap}`);
-
+    for(let gap=Math.floor(n/2);gap>0;gap=Math.floor(gap/2)){
         for(let i=gap;i<n;i++){
             let temp=a[i];
             let j=i;
 
-            addStep(a,`พิจารณา ${temp}`);
-
-            while(j>=gap && a[j-gap]>temp){
-
-                addStep(a,`เปรียบเทียบ ${a[j-gap]} กับ ${temp}`,{
-                    compare:[j-gap,j]
-                });
+            while(j>=gap && shouldSwap(a[j-gap],temp)){
+                addStep(a,
+                `Shell: gap=${gap} เลื่อน`,
+                {compare:[j-gap]});
 
                 a[j]=a[j-gap];
-
-                addStep(a,`เลื่อนค่าไปขวา`,{
-                    swap:[j]
-                });
-
                 j-=gap;
             }
 
             a[j]=temp;
-
-            addStep(a,`ใส่ตำแหน่งถูกต้อง`,{
-                swap:[j]
-            });
+            addStep(a,`ใส่ตำแหน่งใหม่`,{swap:[j]});
         }
     }
-}
-
-// ===== Main =====
-function start(){
-
-    steps=[];
-    stepIndex=0;
-
-    let arr=getArray();
-    let algo=document.getElementById("algo").value;
-
-    drawBars(arr);
-
-    if(algo==="bubble") bubbleSteps(arr);
-    if(algo==="selection") selectionSteps(arr);
-    if(algo==="insertion") insertionSteps(arr);
-    if(algo==="merge") mergeSteps(arr);
-    if(algo==="quick") quickSteps(arr);
-    if(algo==="shell") shellSteps(arr);
-
-    nextStep();
 }
 
 </script>

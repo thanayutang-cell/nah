@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Tree Visualizer</title>
+
+<style>
+body{
+    font-family: Arial;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    text-align:center;
+    color:white;
+}
+
+.container{
+    background:white;
+    color:#333;
+    padding:20px;
+    border-radius:15px;
+    max-width:1000px;
+    margin:auto;
+}
+
+input,button{
+    padding:10px;
+    margin:5px;
+    border-radius:8px;
+    border:none;
+}
+
+button{
+    background:#667eea;
+    color:white;
+    cursor:pointer;
+}
+
+svg{
+    background:#f5f5f5;
+    margin-top:20px;
+}
+
+.node{
+    fill:#667eea;
+}
+
+.highlight{
+    fill:red !important;
+}
+
+.visited{
+    fill:orange !important;
+}
+
+.text{
+    fill:white;
+    text-anchor:middle;
+    dominant-baseline:middle;
+}
+
+.line{
+    stroke:#333;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>🌳 Advanced Tree Visualizer</h2>
+
+<input type="number" id="value" placeholder="Value">
+<button onclick="insert()">Insert</button>
+<button onclick="search()">🔍 Search</button>
+<button onclick="deleteNode()">❌ Delete</button>
+
+<br>
+
+<button onclick="traverse('inorder')">Inorder</button>
+<button onclick="traverse('preorder')">Preorder</button>
+<button onclick="traverse('postorder')">Postorder</button>
+
+<p id="output"></p>
+
+<svg id="tree" width="900" height="400"></svg>
+</div>
+
+<script>
+class Node{
+    constructor(value){
+        this.value = value;
+        this.left = null;
+        this.right = null;
+        this.x = 0;
+        this.y = 0;
+    }
+}
+
+let root = null;
+let nodes = [];
+
+function insert(){
+    const val = parseInt(value.value);
+    if(isNaN(val)) return;
+
+    root = insertNode(root,val);
+    drawTree();
+}
+
+function insertNode(node,val){
+    if(!node) return new Node(val);
+
+    if(val < node.value)
+        node.left = insertNode(node.left,val);
+    else
+        node.right = insertNode(node.right,val);
+
+    return node;
+}
+
+function deleteNode(){
+    const val = parseInt(value.value);
+    root = deleteRec(root,val);
+    drawTree();
+}
+
+function deleteRec(node,val){
+    if(!node) return null;
+
+    if(val < node.value) node.left = deleteRec(node.left,val);
+    else if(val > node.value) node.right = deleteRec(node.right,val);
+    else{
+        if(!node.left) return node.right;
+        if(!node.right) return node.left;
+
+        let min = findMin(node.right);
+        node.value = min.value;
+        node.right = deleteRec(node.right,min.value);
+    }
+    return node;
+}
+
+function findMin(node){
+    while(node.left) node = node.left;
+    return node;
+}
+
+function drawTree(){
+    const svg = document.getElementById("tree");
+    svg.innerHTML = "";
+    nodes = [];
+    draw(root,450,40,200);
+}
+
+function draw(node,x,y,gap){
+    if(!node) return;
+
+    node.x = x;
+    node.y = y;
+    nodes.push(node);
+
+    if(node.left){
+        drawLine(x,y,x-gap,y+80);
+        draw(node.left,x-gap,y+80,gap/1.7);
+    }
+    if(node.right){
+        drawLine(x,y,x+gap,y+80);
+        draw(node.right,x+gap,y+80,gap/1.7);
+    }
+
+    drawCircle(node);
+}
+
+function drawCircle(node){
+    const svg = document.getElementById("tree");
+
+    const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",node.x);
+    c.setAttribute("cy",node.y);
+    c.setAttribute("r",20);
+    c.setAttribute("class","node");
+    c.setAttribute("id","node-"+node.value);
+
+    const t = document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",node.x);
+    t.setAttribute("y",node.y);
+    t.setAttribute("class","text");
+    t.textContent = node.value;
+
+    svg.appendChild(c);
+    svg.appendChild(t);
+}
+
+function drawLine(x1,y1,x2,y2){
+    const svg = document.getElementById("tree");
+
+    const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1",x1);
+    l.setAttribute("y1",y1);
+    l.setAttribute("x2",x2);
+    l.setAttribute("y2",y2);
+    l.setAttribute("class","line");
+
+    svg.appendChild(l);
+}
+
+function sleep(ms){
+    return new Promise(r=>setTimeout(r,ms));
+}
+
+// 🔍 SEARCH + ANIMATION
+async function search(){
+    clearHighlight();
+    const val = parseInt(value.value);
+    let node = root;
+
+    while(node){
+        highlight(node.value,"visited");
+        await sleep(500);
+
+        if(node.value === val){
+            highlight(node.value,"highlight");
+            return;
+        }
+
+        node = val < node.value ? node.left : node.right;
+    }
+}
+
+// 📊 TRAVERSAL
+async function traverse(type){
+    clearHighlight();
+    let result = [];
+
+    async function inorder(n){
+        if(!n) return;
+        await inorder(n.left);
+        visit(n,result);
+        await inorder(n.right);
+    }
+
+    async function preorder(n){
+        if(!n) return;
+        visit(n,result);
+        await preorder(n.left);
+        await preorder(n.right);
+    }
+
+    async function postorder(n){
+        if(!n) return;
+        await postorder(n.left);
+        await postorder(n.right);
+        visit(n,result);
+    }
+
+    if(type==="inorder") await inorder(root);
+    if(type==="preorder") await preorder(root);
+    if(type==="postorder") await postorder(root);
+
+    output.innerText = type + ": " + result.join(" → ");
+}
+
+async function visit(node,result){
+    highlight(node.value,"visited");
+    result.push(node.value);
+    await sleep(500);
+}
+
+// 🎨 highlight
+function highlight(val,cls){
+    const el = document.getElementById("node-"+val);
+    if(el) el.classList.add(cls);
+}
+
+function clearHighlight(){
+    nodes.forEach(n=>{
+        let el = document.getElementById("node-"+n.value);
+        if(el){
+            el.classList.remove("highlight","visited");
+        }
+    });
+}
+</script>
+
+</body>
+</html>

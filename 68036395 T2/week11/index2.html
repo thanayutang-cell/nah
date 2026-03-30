@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Expression Tree (With Lines)</title>
+
+<style>
+body{
+    font-family: Arial;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    text-align:center;
+    color:white;
+}
+
+.container{
+    background:white;
+    color:#333;
+    padding:20px;
+    border-radius:15px;
+    max-width:900px;
+    margin:auto;
+}
+
+input{
+    padding:8px;
+    width:250px;
+}
+
+button{
+    margin:5px;
+    padding:8px 12px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+svg{
+    background:#f5f5f5;
+    border-radius:10px;
+    margin-top:20px;
+}
+
+/* node */
+.circle{
+    fill:#4CAF50;
+}
+
+.text{
+    fill:white;
+    font-size:14px;
+    text-anchor:middle;
+    dominant-baseline:middle;
+}
+
+/* highlight */
+.visited{
+    fill:orange !important;
+}
+
+.highlight{
+    fill:red !important;
+}
+
+.line{
+    stroke:#333;
+    stroke-width:2;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>🌳 Expression Tree (With Lines)</h2>
+
+<input type="text" id="expr" placeholder="Example: 3+5*2">
+
+<br>
+
+<button onclick="buildTree()">Build Tree</button>
+<button onclick="traverse('inorder')">Inorder</button>
+<button onclick="traverse('preorder')">Preorder</button>
+<button onclick="traverse('postorder')">Postorder</button>
+
+<p id="output"></p>
+
+<svg id="tree" width="800" height="400"></svg>
+</div>
+
+<script>
+class Node{
+    constructor(value){
+        this.value = value;
+        this.left = null;
+        this.right = null;
+        this.x = 0;
+        this.y = 0;
+    }
+}
+
+let root = null;
+
+// ===== INFIX → POSTFIX =====
+function precedence(op){
+    if(op=="+" || op=="-") return 1;
+    if(op=="*" || op=="/") return 2;
+    return 0;
+}
+
+function infixToPostfix(expr){
+    let stack = [];
+    let output = "";
+
+    for(let ch of expr){
+        if(!isNaN(ch)){
+            output += ch;
+        }else{
+            while(stack.length &&
+                  precedence(stack[stack.length-1]) >= precedence(ch)){
+                output += stack.pop();
+            }
+            stack.push(ch);
+        }
+    }
+
+    while(stack.length) output += stack.pop();
+    return output;
+}
+
+// ===== BUILD TREE =====
+function buildTree(){
+    let expr = document.getElementById("expr").value;
+    let postfix = infixToPostfix(expr);
+
+    let stack = [];
+
+    for(let ch of postfix){
+        let node = new Node(ch);
+
+        if(!isNaN(ch)){
+            stack.push(node);
+        }else{
+            node.right = stack.pop();
+            node.left = stack.pop();
+            stack.push(node);
+        }
+    }
+
+    root = stack.pop();
+    drawTree();
+
+    document.getElementById("output").innerText =
+        "Postfix: " + postfix;
+}
+
+// ===== DRAW TREE =====
+function drawTree(){
+    const svg = document.getElementById("tree");
+    svg.innerHTML = "";
+
+    draw(root,400,40,150);
+}
+
+function draw(node,x,y,gap){
+    if(!node) return;
+
+    node.x = x;
+    node.y = y;
+
+    if(node.left){
+        drawLine(x,y,x-gap,y+80);
+        draw(node.left,x-gap,y+80,gap/1.5);
+    }
+
+    if(node.right){
+        drawLine(x,y,x+gap,y+80);
+        draw(node.right,x+gap,y+80,gap/1.5);
+    }
+
+    drawNode(node);
+}
+
+function drawNode(node){
+    const svg = document.getElementById("tree");
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    circle.setAttribute("cx",node.x);
+    circle.setAttribute("cy",node.y);
+    circle.setAttribute("r",20);
+    circle.setAttribute("class","circle");
+    circle.setAttribute("id","node-"+node.x+"-"+node.y);
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+    text.setAttribute("x",node.x);
+    text.setAttribute("y",node.y);
+    text.setAttribute("class","text");
+    text.textContent = node.value;
+
+    svg.appendChild(circle);
+    svg.appendChild(text);
+}
+
+function drawLine(x1,y1,x2,y2){
+    const svg = document.getElementById("tree");
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",x1);
+    line.setAttribute("y1",y1);
+    line.setAttribute("x2",x2);
+    line.setAttribute("y2",y2);
+    line.setAttribute("class","line");
+
+    svg.appendChild(line);
+}
+
+// ===== TRAVERSAL =====
+async function traverse(type){
+    clearHighlight();
+    let result = [];
+
+    async function visit(n){
+        highlight(n);
+        result.push(n.value);
+        await sleep(500);
+    }
+
+    async function inorder(n){
+        if(!n) return;
+        await inorder(n.left);
+        await visit(n);
+        await inorder(n.right);
+    }
+
+    async function preorder(n){
+        if(!n) return;
+        await visit(n);
+        await preorder(n.left);
+        await preorder(n.right);
+    }
+
+    async function postorder(n){
+        if(!n) return;
+        await postorder(n.left);
+        await postorder(n.right);
+        await visit(n);
+    }
+
+    if(type==="inorder") await inorder(root);
+    if(type==="preorder") await preorder(root);
+    if(type==="postorder") await postorder(root);
+
+    document.getElementById("output").innerText =
+        type + ": " + result.join(" → ");
+}
+
+// ===== HIGHLIGHT =====
+function highlight(node){
+    const el = document.getElementById("node-"+node.x+"-"+node.y);
+    if(el) el.classList.add("visited");
+}
+
+function clearHighlight(){
+    document.querySelectorAll(".circle").forEach(n=>{
+        n.classList.remove("visited","highlight");
+    });
+}
+
+// ===== UTIL =====
+function sleep(ms){
+    return new Promise(r=>setTimeout(r,ms));
+}
+</script>
+
+</body>
+</html>

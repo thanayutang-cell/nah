@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>Advanced Tree Visualizer</title>
+<title>Advanced Tree Visualizer (Fixed)</title>
 
 <style>
 body{
@@ -78,6 +78,8 @@ svg{
 <button onclick="traverse('inorder')">Inorder</button>
 <button onclick="traverse('preorder')">Preorder</button>
 <button onclick="traverse('postorder')">Postorder</button>
+<button onclick="FindMIN()">findmin</button>
+<button onclick="FindMax()">findmax</button>
 
 <p id="output"></p>
 
@@ -98,8 +100,13 @@ class Node{
 let root = null;
 let nodes = [];
 
+function getValue(){
+    return parseInt(document.getElementById("value").value);
+}
+
+// ✅ INSERT
 function insert(){
-    const val = parseInt(value.value);
+    const val = getValue();
     if(isNaN(val)) return;
 
     root = insertNode(root,val);
@@ -109,6 +116,8 @@ function insert(){
 function insertNode(node,val){
     if(!node) return new Node(val);
 
+    if(val === node.value) return node; // กันค่าซ้ำ
+
     if(val < node.value)
         node.left = insertNode(node.left,val);
     else
@@ -117,8 +126,11 @@ function insertNode(node,val){
     return node;
 }
 
+// ✅ DELETE
 function deleteNode(){
-    const val = parseInt(value.value);
+    const val = getValue();
+    if(isNaN(val)) return;
+
     root = deleteRec(root,val);
     drawTree();
 }
@@ -138,16 +150,51 @@ function deleteRec(node,val){
     }
     return node;
 }
+async function FindMax(){
+    clearHighlight();
+    if(!root) return;
 
+    let node = root;
+
+    while(node.right){
+        highlight(node.value,"visited");
+        await sleep(500);
+        node = node.right;
+    }
+
+    highlight(node.value,"highlight");
+
+    document.getElementById("output").innerText =
+        "Max: " + node.value;
+}
+async function FindMIN(){
+    clearHighlight();
+    if(!root) return;
+
+    let node = root;
+
+    while(node.left){
+        highlight(node.value,"visited");
+        await sleep(500);
+        node = node.left;
+    }
+
+    highlight(node.value,"highlight");
+
+    document.getElementById("output").innerText =
+        "Min: " + node.value;
+}
 function findMin(node){
     while(node.left) node = node.left;
     return node;
 }
 
+// ✅ DRAW TREE
 function drawTree(){
     const svg = document.getElementById("tree");
     svg.innerHTML = "";
     nodes = [];
+
     draw(root,450,40,200);
 }
 
@@ -203,14 +250,17 @@ function drawLine(x1,y1,x2,y2){
     svg.appendChild(l);
 }
 
+// ✅ SLEEP
 function sleep(ms){
     return new Promise(r=>setTimeout(r,ms));
 }
 
-// 🔍 SEARCH + ANIMATION
+// 🔍 SEARCH (มีแจ้ง not found)
 async function search(){
     clearHighlight();
-    const val = parseInt(value.value);
+    const val = getValue();
+    if(isNaN(val)) return;
+
     let node = root;
 
     while(node){
@@ -224,6 +274,8 @@ async function search(){
 
         node = val < node.value ? node.left : node.right;
     }
+
+    alert("Not found");
 }
 
 // 📊 TRAVERSAL
@@ -234,13 +286,13 @@ async function traverse(type){
     async function inorder(n){
         if(!n) return;
         await inorder(n.left);
-        visit(n,result);
+        await visit(n,result);
         await inorder(n.right);
     }
 
     async function preorder(n){
         if(!n) return;
-        visit(n,result);
+        await visit(n,result);
         await preorder(n.left);
         await preorder(n.right);
     }
@@ -249,14 +301,15 @@ async function traverse(type){
         if(!n) return;
         await postorder(n.left);
         await postorder(n.right);
-        visit(n,result);
+        await visit(n,result);
     }
 
     if(type==="inorder") await inorder(root);
     if(type==="preorder") await preorder(root);
     if(type==="postorder") await postorder(root);
 
-    output.innerText = type + ": " + result.join(" → ");
+    document.getElementById("output").innerText =
+        type + ": " + result.join(" → ");
 }
 
 async function visit(node,result){
